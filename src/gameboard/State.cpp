@@ -7,3 +7,13 @@
 GameStatus State::getGameStatus() {
     return gameStatus;
 }
+
+std::vector<Move> State::getAllLegalMoves() {
+    // TODO
+    return std::vector<Move>{Move()};
+}
+
+State State::executeMove(Move move) {
+    // TODO
+    return State();
+}
