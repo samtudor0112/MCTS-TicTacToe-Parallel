@@ -3,4 +3,4 @@ project(serial)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(serial main.cpp Node.cpp Node.h)
+add_executable(serial src/main.cpp src/Node.cpp include/Node.hpp src/State.cpp include/State.hpp)
