@@ -7,24 +7,30 @@
 
 
 #include <vector>
-#include "State.hpp"
+#include "../gameboard/State.hpp"
+#include "../gameboard/Move.hpp"
 
+/*
+ * A node in the MCTS search tree
+ */
 class Node {
 private:
-    Node parentNode;
+    Node* parentNode;
     std::vector<Node> childNodes;
     int visits;
     double reward;
     State state;
+    Move move;
 public:
     Node(State state);
-    void setParent(Node parentNode);
+    void setParentAndMove(Node* parentNode, Move move);
     void addVisit(double result);
-    Node getParentNode();
+    Node* getParentNode();
     State getState();
     std::vector<Node> getChildNodes();
     int getVisits();
     double getReward();
+    Move getMove();
 };
 
 

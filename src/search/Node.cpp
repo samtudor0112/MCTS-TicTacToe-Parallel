@@ -2,12 +2,14 @@
 // Created by sam on 4/9/20.
 //
 
-#include "../include/Node.hpp"
+#include "../../include/search/Node.hpp"
+#include "../../include/gameboard/Move.hpp"
 
 Node::Node(State state) : state(state) { }
 
-void Node::setParent(Node parentNode) {
+void Node::setParentAndMove(Node* parentNode, Move move) {
     this->parentNode = parentNode;
+    this->move = move;
 }
 
 void Node::addVisit(double result) {
@@ -15,7 +17,7 @@ void Node::addVisit(double result) {
     this->reward += result;
 }
 
-Node Node::getParentNode() {
+Node* Node::getParentNode() {
     return this->parentNode;
 }
 
@@ -33,6 +35,10 @@ int Node::getVisits() {
 
 double Node::getReward() {
     return this->reward;
+}
+
+Move Node::getMove() {
+    return move;
 }
 
 
