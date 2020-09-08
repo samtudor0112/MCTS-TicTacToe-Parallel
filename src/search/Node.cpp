@@ -8,7 +8,6 @@ Node::Node(State state) : state(state) { }
 
 void Node::setParent(Node* parentNode) {
     this->parentNode = parentNode;
-    this->move = move;
 }
 
 void Node::addVisit(double result) {
