@@ -9,6 +9,8 @@
 
 enum PlayerColour {white, black};
 
+PlayerColour otherPlayer(PlayerColour us);
+
 enum GameStatus {whiteWin, blackWin, inProgress, draw};
 
 // Online solution found to randomly select an element of a vector
@@ -25,5 +27,7 @@ Iter select_randomly(Iter start, Iter end) {
     static std::mt19937 gen(rd());
     return select_randomly(start, end, gen);
 }
+
+
 
 #endif //SERIAL_COMMON_HPP

@@ -15,7 +15,7 @@
 class Node {
 private:
     Node* parentNode;
-    std::vector<Node> childNodes;
+    std::vector<Node*> childNodes;
     int visits;
     double reward;
     State state;
@@ -25,9 +25,10 @@ public:
     void addVisit(double result);
     Node* getParentNode();
     State getState();
-    std::vector<Node> getChildNodes();
+    std::vector<Node*>* getChildNodes();
     int getVisits();
     double getReward();
+    void addChildNode(Node* node);
 };
 
 

@@ -13,5 +13,8 @@ int main(int argc, char** argv) {
         int timeToUse = 3;
         MCTS search = MCTS(currentState, timeToUse, ourColour);
         State bestMove = search.getBestMove();
+        std::cout << bestMove.getStringBoard() << std::flush;
+        // Temp
+//        break;
     }
 }

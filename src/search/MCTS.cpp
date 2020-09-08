@@ -6,10 +6,10 @@
 #include <chrono>
 #include <algorithm>
 #include <functional>
+#include <iostream>
 
 MCTS::MCTS(State startState, int timeLimit, PlayerColour colour) :
-        timeLimit(timeLimit), ourColour(colour), root(Node(startState)) {
-}
+        timeLimit(timeLimit), ourColour(colour), root(Node(startState)) {}
 /*
  * Executes the MCTS search. Takes slightly longer than timeLimit. Will return the approximately best Move object to
  * perform.
@@ -19,50 +19,56 @@ State MCTS::getBestMove() {
     auto endTime = startTime + std::chrono::seconds(timeLimit);
 
     while (std::chrono::system_clock::now() < endTime) {
-        Node newNode = selectAndExpandNewNode();
+        Node* newNode = selectAndExpandNewNode();
         double playoutResult = simulatePlayout(newNode);
-        backPropagateResult(&newNode, playoutResult);
+        backPropagateResult(newNode, playoutResult);
     }
 
     return getBestMoveFromFinishedTree();
 }
 
-Node MCTS::selectAndExpandNewNode() {
+Node* MCTS::selectAndExpandNewNode() {
     // We start at the root
-    Node node = this->root;
+    Node* node = &this->root;
 
     // Traverse the tree, selecting the best UCT score each time, until we have a leaf node
-    while (node.getChildNodes().size() != 0) {
-        int parentVisits = node.getVisits();
-        node = *std::max_element(node.getChildNodes().begin(), node.getChildNodes().end(), \
-                [&](const Node& a, const Node& b) {
-                    return UCTValue(a, parentVisits) < UCTValue(b, parentVisits);
-                }
-        );
+    while (node->getChildNodes()->size() != 0) {
+        int parentVisits = node->getVisits();
+        int maxScore = -1;
+        Node* newNode;
+        // Find node with max UCT value
+        for (Node* find_node: *node->getChildNodes()) {
+            int val = UCTValue(find_node, parentVisits);
+            if (val > maxScore) {
+                maxScore = val;
+                newNode = find_node;
+            }
+        }
+        node = newNode;
     }
 
     // Expand node if it's still in progress
-    if (node.getState().getGameStatus() == inProgress) {
+    if (node->getState().getGameStatus() == inProgress) {
         expandNode(node);
-        node = *select_randomly(node.getChildNodes().begin(), node.getChildNodes().end());
+        node = *select_randomly(node->getChildNodes()->begin(), node->getChildNodes()->end());
     }
 
     return node;
 }
 
-void MCTS::expandNode(Node parent) {
-    State boardState = parent.getState();
+void MCTS::expandNode(Node* parent) {
+    State boardState = parent->getState();
     std::vector<State> validMoves = boardState.getAllLegalMoveStates();
     for (State state: validMoves) {
-        Node newNode = Node(state);
-        newNode.setParent(&parent);
-        parent.getChildNodes().push_back(newNode);
+        Node* newNode = new Node(state);
+        newNode->setParent(parent);
+        parent->addChildNode(newNode);
     }
 }
 
-double MCTS::simulatePlayout(Node node) {
+double MCTS::simulatePlayout(Node* node) {
     // Random playout
-    State boardState = node.getState();
+    State boardState = node->getState();
     while (boardState.getGameStatus() == inProgress) {
         std::vector<State> validMoves = boardState.getAllLegalMoveStates();
         boardState = *select_randomly(validMoves.begin(), validMoves.end());
@@ -80,7 +86,7 @@ double MCTS::simulatePlayout(Node node) {
 }
 
 void MCTS::backPropagateResult(Node* node, double playoutResult) {
-    while (node) {
+    while (node != nullptr) {
         node->addVisit(playoutResult);
         node = node->getParentNode();
     }
@@ -88,21 +94,27 @@ void MCTS::backPropagateResult(Node* node, double playoutResult) {
 
 // Returns the approximately best move to make from the root. Will be null if starting at a won/lost/drawn position
 State MCTS::getBestMoveFromFinishedTree() {
-    Node bestNode = *std::max_element(root.getChildNodes().begin(), root.getChildNodes().end(), \
-                    [&](Node a, Node b) {
-                                          return a.getVisits() < b.getVisits();
-                    }
-    );
-    return bestNode.getState();
+    // Find node with max visits value
+    int maxVisits = -1;
+    Node* bestNode;
+    for (Node* find_node: *root.getChildNodes()) {
+        int val = find_node->getVisits();
+        if (val > maxVisits) {
+            maxVisits = val;
+            bestNode = find_node;
+        }
+    }
+    return bestNode->getState();
 }
 
-double MCTS::UCTValue(Node node, int parentVisits) {
-    if (node.getVisits() == 0) {
+double MCTS::UCTValue(Node* node, int parentVisits) {
+    if (node->getVisits() == 0) {
         // Always visit each node once
         return std::numeric_limits<double>::max();
     }
 
-    return node.getReward() / (double) node.getVisits() + sqrt(2.0 * log(parentVisits)) / (double) node.getVisits();
+    return node->getReward() / (double) node->getVisits()
+            + sqrt(2.0 * log(parentVisits)) / (double) node->getVisits();
 
 }
 

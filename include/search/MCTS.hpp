@@ -17,12 +17,12 @@ private:
     Node root;
     int timeLimit;
     PlayerColour ourColour;
-    Node selectAndExpandNewNode();
-    void expandNode(Node parent);
-    double simulatePlayout(Node node);
+    Node* selectAndExpandNewNode();
+    void expandNode(Node* parent);
+    double simulatePlayout(Node* node);
     void backPropagateResult(Node* node, double playoutResult);
     State getBestMoveFromFinishedTree();
-    static double UCTValue(Node node, int parentVisits);
+    static double UCTValue(Node* node, int parentVisits);
 public:
     MCTS(State startState, int timeLimit, PlayerColour colour);
     State getBestMove();
