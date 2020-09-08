@@ -1,7 +1,3 @@
-//
-// Created by sam on 4/9/20.
-//
-
 #include "../../include/search/Node.hpp"
 
 Node::Node(State state) : state(state), parentNode(nullptr), visits(0), reward(0), childNodes(std::vector<Node*>()) {}

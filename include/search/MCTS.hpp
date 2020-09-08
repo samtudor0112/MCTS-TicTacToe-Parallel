@@ -1,7 +1,3 @@
-//
-// Created by sam on 4/9/20.
-//
-
 #ifndef SERIAL_MCTS_HPP
 #define SERIAL_MCTS_HPP
 
@@ -9,24 +5,29 @@
 #include "Node.hpp"
 #include "../gameboard/common.hpp"
 
-/*
- * Runs MCTS search for a given root node.
- */
+// Runs Monte Carlo Tree Search from a given start state for timeLimit seconds.
+// Example use:
+//      MCTS search = MCTS(currentState, timeToUse, ourColour);
+//      State bestMove = search.getBestMove();
+// See report for explanation of MCTS algorithm.
 class MCTS {
 private:
     Node root;
     int timeLimit;
-    PlayerColour ourColour;
+
+    // 4 Steps of the MCTS algorithm
     Node* selectAndExpandNewNode();
     void expandNode(Node* parent);
     GameStatus simulatePlayout(Node* node);
     void backPropagateResult(Node* node, GameStatus playoutResult);
-    double getReward(PlayerColour nodeColour, GameStatus result);
-    State getBestMoveFromFinishedTree();
+
+    // Other supporting functions
     static double UCTValue(Node* node, int parentVisits);
     void cleanUpNodes();
+    double getReward(PlayerColour nodeColour, GameStatus result);
+    State getBestMoveFromFinishedTree();
 public:
-    MCTS(State startState, int timeLimit, PlayerColour colour);
+    MCTS(State startState, int timeLimit);
     State getBestMove();
 };
 

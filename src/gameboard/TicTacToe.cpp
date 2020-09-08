@@ -1,11 +1,7 @@
-//
-// Created by sam on 8/9/20.
-//
-
 #include "../../include/gameboard/TicTacToe.hpp"
 
 TicTacToe::TicTacToe() {
-    // Default
+    // The default (empty) starting board
     this->board = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 
@@ -13,6 +9,7 @@ TicTacToe::TicTacToe(std::array<int, 9> _board) {
     this->board = _board;
 }
 
+// Returns a vector of all TicTacToe boards possible after one legal move by the player whose turn it is.
 std::vector<TicTacToe> TicTacToe::getAllLegalMoveStates(PlayerColour turn) {
     std::vector<TicTacToe> out = std::vector<TicTacToe>();
     std::array<int, 9> newBoard = board;
@@ -26,8 +23,9 @@ std::vector<TicTacToe> TicTacToe::getAllLegalMoveStates(PlayerColour turn) {
     return out;
 }
 
+// Determines whether either player has won, whether the game is drawn, or still ongoing.
 GameStatus TicTacToe::getGameStatus() {
-    // Check every row, column, diagonal
+    // Check every row, column, diagonal to see if someone has won
     int sum;
     for (int i = 0; i < 3; i++) {
         // Rows
@@ -46,7 +44,7 @@ GameStatus TicTacToe::getGameStatus() {
             return blackWin;
         }
     }
-    // Diags
+    // Diagonals
     sum = board[0] + board[4] + board[8];
     if (sum == 3) {
         return whiteWin;
@@ -70,6 +68,7 @@ GameStatus TicTacToe::getGameStatus() {
     return draw;
 }
 
+// Returns a (crappy) string representation of the current board.
 std::string TicTacToe::boardToString() {
     std::string out = "---\n";
     for (int i = 0; i < 3; i++) {
