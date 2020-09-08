@@ -23,6 +23,7 @@ public:
     GameStatus getGameStatus();
     std::vector<State> getAllLegalMoveStates();
     std::string getStringBoard();
+    PlayerColour getTurn();
 };
 
 

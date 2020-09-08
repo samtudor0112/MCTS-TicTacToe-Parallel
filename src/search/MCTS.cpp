@@ -20,7 +20,7 @@ State MCTS::getBestMove() {
 
     while (std::chrono::system_clock::now() < endTime) {
         Node* newNode = selectAndExpandNewNode();
-        double playoutResult = simulatePlayout(newNode);
+        GameStatus playoutResult = simulatePlayout(newNode);
         backPropagateResult(newNode, playoutResult);
     }
 
@@ -34,11 +34,11 @@ Node* MCTS::selectAndExpandNewNode() {
     // Traverse the tree, selecting the best UCT score each time, until we have a leaf node
     while (node->getChildNodes()->size() != 0) {
         int parentVisits = node->getVisits();
-        int maxScore = -1;
+        double maxScore = -1;
         Node* newNode;
         // Find node with max UCT value
-        for (Node* find_node: *node->getChildNodes()) {
-            int val = UCTValue(find_node, parentVisits);
+        for (Node* find_node: *(node->getChildNodes())) {
+            double val = UCTValue(find_node, parentVisits);
             if (val > maxScore) {
                 maxScore = val;
                 newNode = find_node;
@@ -66,7 +66,7 @@ void MCTS::expandNode(Node* parent) {
     }
 }
 
-double MCTS::simulatePlayout(Node* node) {
+GameStatus MCTS::simulatePlayout(Node* node) {
     // Random playout
     State boardState = node->getState();
     while (boardState.getGameStatus() == inProgress) {
@@ -74,20 +74,27 @@ double MCTS::simulatePlayout(Node* node) {
         boardState = *select_randomly(validMoves.begin(), validMoves.end());
     }
 
-    // Reward function
-    if (boardState.getGameStatus() == whiteWin) {
-        return ourColour == white ? 1 : 0;
-    } else if (boardState.getGameStatus() == blackWin) {
-        return ourColour == black ? 1 : 0;
+    return boardState.getGameStatus();
+}
+
+// Reward function
+double MCTS::getReward(PlayerColour nodeColour, GameStatus result) {
+    // Note this function is actually reversed i.e. on white nodes, black is rewarded for winning.
+    // This is so black node expand white child nodes which are most promising for it
+    if (result == whiteWin) {
+        return nodeColour == black ? 1 : 0;
+    } else if (result == blackWin) {
+        return nodeColour == white ? 1 : 0;
     } else {
         // Draw
         return 0.3; // We'd prefer to win once than draw 3 times.
     }
 }
 
-void MCTS::backPropagateResult(Node* node, double playoutResult) {
+void MCTS::backPropagateResult(Node* node, GameStatus playoutResult) {
     while (node != nullptr) {
-        node->addVisit(playoutResult);
+        double reward = getReward(node->getState().getTurn(), playoutResult);
+        node->addVisit(reward);
         node = node->getParentNode();
     }
 }
@@ -114,7 +121,7 @@ double MCTS::UCTValue(Node* node, int parentVisits) {
     }
 
     return node->getReward() / (double) node->getVisits()
-            + sqrt(2.0 * log(parentVisits)) / (double) node->getVisits();
+            + sqrt(2.0 * log(parentVisits) / (double) node->getVisits());
 
 }
 

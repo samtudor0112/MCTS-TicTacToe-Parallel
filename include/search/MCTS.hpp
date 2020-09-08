@@ -19,8 +19,9 @@ private:
     PlayerColour ourColour;
     Node* selectAndExpandNewNode();
     void expandNode(Node* parent);
-    double simulatePlayout(Node* node);
-    void backPropagateResult(Node* node, double playoutResult);
+    GameStatus simulatePlayout(Node* node);
+    void backPropagateResult(Node* node, GameStatus playoutResult);
+    double getReward(PlayerColour nodeColour, GameStatus result);
     State getBestMoveFromFinishedTree();
     static double UCTValue(Node* node, int parentVisits);
 public:

@@ -31,7 +31,7 @@ GameStatus TicTacToe::getGameStatus() {
     int sum;
     for (int i = 0; i < 3; i++) {
         // Rows
-        sum = board[0 + i] + board[1 + i] + board[2 + i];
+        sum = board[0 + 3*i] + board[1 + 3*i] + board[2 + 3*i];
         if (sum == 3) {
             return whiteWin;
         } else if (sum == -3) {

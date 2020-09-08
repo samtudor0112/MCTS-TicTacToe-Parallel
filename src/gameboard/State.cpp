@@ -32,3 +32,7 @@ void State::updateGameStatus() {
 std::string State::getStringBoard() {
     return board.boardToString();
 }
+
+PlayerColour State::getTurn() {
+    return turn;
+}
