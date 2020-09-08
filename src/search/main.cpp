@@ -4,7 +4,7 @@
 #include "../../include/search/MCTS.hpp"
 
 int main(int argc, char** argv) {
-    // TEMPORARY
+    // Plays against itself
     PlayerColour ourColour = white;
 
     State currentState = State();
@@ -14,7 +14,10 @@ int main(int argc, char** argv) {
         MCTS search = MCTS(currentState, timeToUse, ourColour);
         State bestMove = search.getBestMove();
         std::cout << bestMove.getStringBoard() << std::flush;
-        // Temp
-        break;
+        if (bestMove.getGameStatus() != inProgress) {
+            break;
+        }
+        ourColour = otherPlayer(ourColour);
+        currentState = bestMove;
     }
 }
