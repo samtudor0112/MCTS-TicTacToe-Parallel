@@ -12,6 +12,6 @@ int main(int argc, char** argv) {
     while(true) {
         int timeToUse = 3;
         MCTS search = MCTS(currentState, timeToUse, ourColour);
-        Move bestMove = search.getBestMove();
+        State bestMove = search.getBestMove();
     }
 }

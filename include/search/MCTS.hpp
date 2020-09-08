@@ -8,7 +8,6 @@
 #include <functional>
 #include "Node.hpp"
 #include "../gameboard/common.hpp"
-#include "../gameboard/Move.hpp"
 
 /*
  * Runs MCTS search for a given root node.
@@ -22,11 +21,11 @@ private:
     void expandNode(Node parent);
     double simulatePlayout(Node node);
     void backPropagateResult(Node* node, double playoutResult);
-    Move getBestMoveFromFinishedTree();
+    State getBestMoveFromFinishedTree();
     static double UCTValue(Node node, int parentVisits);
 public:
     MCTS(State startState, int timeLimit, PlayerColour colour);
-    Move getBestMove();
+    State getBestMove();
 };
 
 

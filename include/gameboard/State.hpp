@@ -7,15 +7,13 @@
 
 
 #include "common.hpp"
-#include "Move.hpp"
 
 class State {
 private:
     GameStatus gameStatus;
 public:
     GameStatus getGameStatus();
-    std::vector<Move> getAllLegalMoves();
-    State executeMove(Move move);
+    std::vector<State> getAllLegalMoveStates();
 };
 
 

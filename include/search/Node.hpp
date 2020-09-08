@@ -8,7 +8,6 @@
 
 #include <vector>
 #include "../gameboard/State.hpp"
-#include "../gameboard/Move.hpp"
 
 /*
  * A node in the MCTS search tree
@@ -20,17 +19,15 @@ private:
     int visits;
     double reward;
     State state;
-    Move move;
 public:
     Node(State state);
-    void setParentAndMove(Node* parentNode, Move move);
+    void setParent(Node* parentNode);
     void addVisit(double result);
     Node* getParentNode();
     State getState();
     std::vector<Node> getChildNodes();
     int getVisits();
     double getReward();
-    Move getMove();
 };
 
 

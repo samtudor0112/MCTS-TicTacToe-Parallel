@@ -3,11 +3,10 @@
 //
 
 #include "../../include/search/Node.hpp"
-#include "../../include/gameboard/Move.hpp"
 
 Node::Node(State state) : state(state) { }
 
-void Node::setParentAndMove(Node* parentNode, Move move) {
+void Node::setParent(Node* parentNode) {
     this->parentNode = parentNode;
     this->move = move;
 }
@@ -35,10 +34,6 @@ int Node::getVisits() {
 
 double Node::getReward() {
     return this->reward;
-}
-
-Move Node::getMove() {
-    return move;
 }
 
 

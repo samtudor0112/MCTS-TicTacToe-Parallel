@@ -14,7 +14,7 @@ MCTS::MCTS(State startState, int timeLimit, PlayerColour colour) :
  * Executes the MCTS search. Takes slightly longer than timeLimit. Will return the approximately best Move object to
  * perform.
  */
-Move MCTS::getBestMove() {
+State MCTS::getBestMove() {
     auto startTime = std::chrono::system_clock::now();
     auto endTime = startTime + std::chrono::seconds(timeLimit);
 
@@ -52,11 +52,10 @@ Node MCTS::selectAndExpandNewNode() {
 
 void MCTS::expandNode(Node parent) {
     State boardState = parent.getState();
-    std::vector<Move> validMoves = boardState.getAllLegalMoves();
-    for (Move move: validMoves) {
-        State newBoardState = boardState.executeMove(move);
-        Node newNode = Node(newBoardState);
-        newNode.setParentAndMove(&parent, move);
+    std::vector<State> validMoves = boardState.getAllLegalMoveStates();
+    for (State state: validMoves) {
+        Node newNode = Node(state);
+        newNode.setParent(&parent);
         parent.getChildNodes().push_back(newNode);
     }
 }
@@ -65,8 +64,8 @@ double MCTS::simulatePlayout(Node node) {
     // Random playout
     State boardState = node.getState();
     while (boardState.getGameStatus() == inProgress) {
-        std::vector<Move> validMoves = boardState.getAllLegalMoves();
-        boardState = boardState.executeMove(*select_randomly(validMoves.begin(), validMoves.end()));
+        std::vector<State> validMoves = boardState.getAllLegalMoveStates();
+        boardState = *select_randomly(validMoves.begin(), validMoves.end());
     }
 
     // Reward function
@@ -88,13 +87,13 @@ void MCTS::backPropagateResult(Node* node, double playoutResult) {
 }
 
 // Returns the approximately best move to make from the root. Will be null if starting at a won/lost/drawn position
-Move MCTS::getBestMoveFromFinishedTree() {
+State MCTS::getBestMoveFromFinishedTree() {
     Node bestNode = *std::max_element(root.getChildNodes().begin(), root.getChildNodes().end(), \
                     [&](Node a, Node b) {
                                           return a.getVisits() < b.getVisits();
                     }
     );
-    return bestNode.getMove();
+    return bestNode.getState();
 }
 
 double MCTS::UCTValue(Node node, int parentVisits) {
