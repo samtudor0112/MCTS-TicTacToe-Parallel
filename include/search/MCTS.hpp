@@ -24,6 +24,7 @@ private:
     double getReward(PlayerColour nodeColour, GameStatus result);
     State getBestMoveFromFinishedTree();
     static double UCTValue(Node* node, int parentVisits);
+    void cleanUpNodes();
 public:
     MCTS(State startState, int timeLimit, PlayerColour colour);
     State getBestMove();

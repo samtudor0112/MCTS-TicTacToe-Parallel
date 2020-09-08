@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <stack>
 
 MCTS::MCTS(State startState, int timeLimit, PlayerColour colour) :
         timeLimit(timeLimit), ourColour(colour), root(Node(startState)) {}
@@ -111,7 +112,27 @@ State MCTS::getBestMoveFromFinishedTree() {
             bestNode = find_node;
         }
     }
-    return bestNode->getState();
+    // Grab the best state before cleaning up our nodes
+    State bestState = bestNode->getState();
+    cleanUpNodes();
+
+    return bestState;
+}
+
+// Manually clean up all the nodes of the tree. Iteratively deletes every non-root node.
+void MCTS::cleanUpNodes() {
+    std::deque<Node*> nodeStack;
+    for (Node* child: *(root.getChildNodes())) {
+        nodeStack.push_back(child);
+    }
+    while(!nodeStack.empty()) {
+        Node* toDelete = nodeStack.back();
+        nodeStack.pop_back();
+        for (Node* child: *(toDelete->getChildNodes())) {
+            nodeStack.push_back(child);
+        }
+        delete toDelete;
+    }
 }
 
 double MCTS::UCTValue(Node* node, int parentVisits) {

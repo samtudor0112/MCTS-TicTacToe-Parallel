@@ -20,4 +20,5 @@ int main(int argc, char** argv) {
         ourColour = otherPlayer(ourColour);
         currentState = bestMove;
     }
+    std::cout << "Done!" <<std::flush;
 }
