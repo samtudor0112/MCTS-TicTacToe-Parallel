@@ -31,7 +31,7 @@ Node* MCTS::selectAndExpandNewNode() {
     Node* node = &this->root;
 
     // Traverse the tree, selecting the best UCT score each time, until we have a leaf node
-    while (node->getChildNodes()->size() != 0) {
+    while (node->getChildNodes()->size()) {
         int parentVisits = node->getVisits();
         double maxScore = -1;
         Node* newNode;
