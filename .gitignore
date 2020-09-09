@@ -3,6 +3,6 @@ out/
 *.iml
 .DS_Store
 */.DS_Store
-cmake-build-debug/
+cmake-build-*/
 .directory
 */.directory
