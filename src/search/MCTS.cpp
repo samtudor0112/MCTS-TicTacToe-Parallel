@@ -6,14 +6,14 @@
 #include <stack>
 
 // We assume that we are the player who's colour's turn it is in the startState.
-MCTS::MCTS(State startState, int timeLimit) :
+MCTS::MCTS(State startState, double timeLimit) :
         timeLimit(timeLimit), root(Node(startState)) {}
 
 // Executes the MCTS search. Takes slightly longer than timeLimit.
 // Will return the approximately best State object which is the result of the best move.
 State MCTS::getBestMove() {
     auto startTime = std::chrono::system_clock::now();
-    auto endTime = startTime + std::chrono::seconds(timeLimit);
+    auto endTime = startTime + std::chrono::duration<double>(timeLimit);
 
     while (std::chrono::system_clock::now() < endTime) {
         Node* newNode = selectAndExpandNewNode();

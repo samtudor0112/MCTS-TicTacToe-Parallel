@@ -13,7 +13,7 @@
 class MCTS {
 private:
     Node root;
-    int timeLimit;
+    double timeLimit;
 
     // 4 Steps of the MCTS algorithm
     Node* selectAndExpandNewNode();
@@ -27,7 +27,7 @@ private:
     double getReward(PlayerColour nodeColour, GameStatus result);
     State getBestMoveFromFinishedTree();
 public:
-    MCTS(State startState, int timeLimit);
+    MCTS(State startState, double timeLimit);
     State getBestMove();
 };
 
