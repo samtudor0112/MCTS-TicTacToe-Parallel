@@ -23,7 +23,7 @@ GameStatus play_game(State startState, double timeToUse, bool print) {
 int main(int argc, char** argv) {
     std::cout << "Start\n" << std::flush;
     State currentState = State();
-    play_game(currentState, 3, true);
+    play_game(currentState, 0.03, true);
     std::cout << "Done!\n" << std::flush;
 }
 

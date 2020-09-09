@@ -70,7 +70,7 @@ GameStatus TicTacToe::getGameStatus() {
 
 // Returns a (crappy) string representation of the current board.
 std::string TicTacToe::boardToString() {
-    std::string out = "---\n";
+    std::string out = "-------\n";
     for (int i = 0; i < 3; i++) {
         out += '|';
         for (int j = 0; j < 3; j++) {
@@ -86,7 +86,7 @@ std::string TicTacToe::boardToString() {
             out += '|';
         }
         out += '\n';
-        out += "---\n";
+        out += "-------\n";
     }
     return out;
 }
