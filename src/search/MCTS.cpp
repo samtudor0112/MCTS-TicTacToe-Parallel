@@ -158,3 +158,6 @@ double MCTS::UCTValue(Node* node, int parentVisits) {
             + sqrt(2.0 * log(parentVisits) / (double) node->getVisits());
 }
 
+Node* MCTS::getRoot() {
+    return &root;
+}

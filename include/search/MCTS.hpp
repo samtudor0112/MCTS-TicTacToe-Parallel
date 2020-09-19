@@ -29,6 +29,7 @@ private:
 public:
     MCTS(State startState, double timeLimit);
     State getBestMove();
+    Node* getRoot();
 };
 
 
