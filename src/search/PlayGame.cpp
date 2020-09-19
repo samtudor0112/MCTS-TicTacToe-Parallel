@@ -28,14 +28,14 @@ double play_game_vps(State startState, double timeToUse, bool print) {
         MCTS search = MCTS(currentState, timeToUse);
         State bestMove = search.getBestMove();
 
-        sumVps += search.getRoot()->getVisits() / timeToUse;
-        numMoves ++;
+        sumVps += search.getRoot()->getVisits();
+        numMoves++;
 
         if (print) {
             std::cout << bestMove.getStringBoard() << std::flush;
         }
         if (bestMove.getGameStatus() != inProgress) {
-            return sumVps / numMoves;
+            return sumVps / (numMoves * timeToUse);
         }
         currentState = bestMove;
     }
