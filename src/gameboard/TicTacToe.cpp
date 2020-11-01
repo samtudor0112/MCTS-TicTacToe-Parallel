@@ -1,71 +1,72 @@
 #include "../../include/gameboard/TicTacToe.hpp"
 
-TicTacToe::TicTacToe() {
+TicTacToe::TicTacToe(int n, int d) {
     // The default (empty) starting board
-    this->board = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    this->n = n;
+    this->d = d;
+
+    int size = pow(n, d);
+    this->whiteBoard = calloc(size, sizeof(int));
+    this->blackBoard = calloc(size, sizeof(int));
+
+    this->numMoves = 0;
+
+    this->gameStatus = inProgress;
 }
 
-TicTacToe::TicTacToe(std::array<int, 9> _board) {
-    this->board = _board;
+TicTacToe::TicTacToe(int n, int d, int[] _whiteBoard, int[] _blackBoard, int _numMoves) {
+    this->n = n;
+    this->d = d;
+
+    this->whiteBoard = _whiteBoard;
+    this->blackBoard = _blackBoard;
+
+    this->numMoves = _numMoves;
 }
 
 // Returns a vector of all TicTacToe boards possible after one legal move by the player whose turn it is.
 std::vector<TicTacToe> TicTacToe::getAllLegalMoveStates(PlayerColour turn) {
+    int size = pow(n, d);
     std::vector<TicTacToe> out = std::vector<TicTacToe>();
-    std::array<int, 9> newBoard = board;
-    for (int i = 0; i < 9; i++) {
-        if (board[i] == 0) {
-            newBoard[i] = turn == white ? 1 : -1;
-            out.push_back(TicTacToe(newBoard));
-            newBoard = board;
+    int[] newBoard;
+    int[] oldBoard = turn == white ? whiteBoard : blackBoard;
+
+    for (int i = 0; i < size; i++) {
+        if (oldBoard[i] == 0) {
+            newBoard = malloc(sizeof(int)) * size;
+            memcpy(newBord, oldBoard, sizeof(int) * size);
+            newBoard[i] = 1;
+            TicTacToe newGame;
+            if (turn == white) {
+                newGame = TicTacToe(n, d, newBoard, blackBoard, numMoves + 1);
+            } else {
+                newGame =  TicTacToe(n, d, whiteBoard, newBoard, numMoves + 1);
+            }
+            newGame.updateGameStatus(turn, i);
+            out.push_back(newGame);
         }
     }
     return out;
 }
 
-// Determines whether either player has won, whether the game is drawn, or still ongoing.
-GameStatus TicTacToe::getGameStatus() {
+// Determines whether the player of colour lastTurn has won, whether the game is drawn, or still ongoing. The last move was at position lastPosition.
+void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
+    int size = pow(n, d);
+    // We only check this board for a win
+    int[] board = lastTurn == white ? whiteBoard : blackBoard;
+    gameStatus win = lastTurn == white ? whiteWin : blackWin;
+
     // Check every row, column, diagonal to see if someone has won
     int sum;
-    for (int i = 0; i < 3; i++) {
-        // Rows
-        sum = board[0 + 3*i] + board[1 + 3*i] + board[2 + 3*i];
-        if (sum == 3) {
-            return whiteWin;
-        } else if (sum == -3) {
-            return blackWin;
-        }
-
-        // Columns
-        sum = board[0 + i] + board[3 + i] + board[6 + i];
-        if (sum == 3) {
-            return whiteWin;
-        } else if (sum == -3) {
-            return blackWin;
-        }
-    }
-    // Diagonals
-    sum = board[0] + board[4] + board[8];
-    if (sum == 3) {
-        return whiteWin;
-    } else if (sum == -3) {
-        return blackWin;
+    // TODO
+    for (int dimsChanged = 1; dimsChanged <= d; dimsChanged++) {
+        // TODO
+        this->status = win;
+        return;
     }
 
-    sum = board[2] + board[4] + board[6];
-    if (sum == 3) {
-        return whiteWin;
-    } else if (sum == -3) {
-        return blackWin;
-    }
-
-    // Check if its drawn or still going
-    for (int i = 0; i < 9; i++) {
-        if (board[i] == 0) {
-            return inProgress;
-        }
-    }
-    return draw;
+    // Check if it's drawn or still going
+    status = numMoves == size ? draw : inProgress;
 }
 
 // Returns a (crappy) string representation of the current board.
@@ -91,3 +92,6 @@ std::string TicTacToe::boardToString() {
     return out;
 }
 
+GameStatus TicTacToe::getGameStatus() {
+    return this->status;
+}

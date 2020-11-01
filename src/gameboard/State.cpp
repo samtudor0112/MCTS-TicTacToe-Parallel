@@ -1,7 +1,8 @@
 #include "../../include/gameboard/State.hpp"
 
+// A totally decorative wrapper for our current game's (e.g. Tic Tac Toe's) getGameStatus function.
 GameStatus State::getGameStatus() {
-    return gameStatus;
+    return board.getGameStatus();
 }
 
 // Returns a vector of all States possible after one legal move by the player whose turn it is
@@ -17,18 +18,9 @@ std::vector<State> State::getAllLegalMoveStates() {
 }
 
 // Default board of our current game (e.g. Tic Tac Toe), default white's turn
-State::State() : turn(white), board(TicTacToe()) {
-    updateGameStatus();
-}
+State::State(int n, int d) : turn(white), board(TicTacToe(n, d)) {}
 
-State::State(PlayerColour turn, TicTacToe board) : turn(turn), board(board) {
-    updateGameStatus();
-}
-
-// A totally decorative wrapper for our current game's (e.g. Tic Tac Toe's) getGameStatus function.
-void State::updateGameStatus() {
-    gameStatus = board.getGameStatus();
-}
+State::State(PlayerColour turn, TicTacToe board) : turn(turn), board(board) {}
 
 // A totally decorative wrapper for our current game's (e.g. Tic Tac Toe's) getStringBoard function.
 std::string State::getStringBoard() {
