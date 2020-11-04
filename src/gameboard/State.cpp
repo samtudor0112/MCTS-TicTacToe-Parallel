@@ -13,8 +13,8 @@ std::vector<State> State::getAllLegalMoveStates() {
     std::vector<TicTacToe> boards = board.getAllLegalMoveStates(turn);
     // We try this to improve the time spent in push_back
     out.reserve(boards.size());
-    for(TicTacToe board: boards) {
-        out.push_back(State(otherPlayer(turn), board));
+    for(const TicTacToe& each_board: boards) {
+        out.emplace_back(State(otherPlayer(turn), each_board));
     }
     return out;
 }
@@ -22,7 +22,7 @@ std::vector<State> State::getAllLegalMoveStates() {
 // Default board of our current game (e.g. Tic Tac Toe), default white's turn
 State::State(int n, int d) : turn(white), board(TicTacToe(n, d)) {}
 
-State::State(PlayerColour turn, TicTacToe board) : turn(turn), board(board) {}
+State::State(PlayerColour turn, const TicTacToe& board) : turn(turn), board(board) {}
 
 // A totally decorative wrapper for our current game's (e.g. Tic Tac Toe's) getStringBoard function.
 std::string State::getStringBoard() {

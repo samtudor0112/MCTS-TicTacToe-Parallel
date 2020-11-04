@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iterator>
+#include <utility>
 #include "../../include/gameboard/TicTacToe.hpp"
 
 TicTacToe::TicTacToe(int n, int d) {
@@ -20,8 +21,8 @@ TicTacToe::TicTacToe(int n, int d, std::vector<int> _whiteBoard, std::vector<int
     this->n = n;
     this->d = d;
 
-    this->whiteBoard = _whiteBoard;
-    this->blackBoard = _blackBoard;
+    this->whiteBoard = std::move(_whiteBoard);
+    this->blackBoard = std::move(_blackBoard);
 
     this->numMoves = _numMoves;
 }
@@ -350,7 +351,7 @@ GameStatus TicTacToe::getGameStatus() {
     return this->status;
 }
 
-int TicTacToe::getSize() {
+int TicTacToe::getSize() const {
     return pow(n, d);
 }
 

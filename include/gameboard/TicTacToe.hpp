@@ -27,7 +27,7 @@ public:
     std::string boardToString();
     GameStatus getGameStatus();
     ~TicTacToe();
-    int getSize();
+    int getSize() const;
 };
 
 
