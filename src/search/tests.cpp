@@ -15,8 +15,8 @@ void testCorrectness(int numTrials, double timeToUse, int n, int d) {
         }
     }
 
-    std::cout << "The engine had a draw percentage of " << (double)numDraws / numTrials * 100
-            << "% and a white win percentage of " << (double)numWhiteWins / numTrials * 100 << "% with " << timeToUse \
+    std::cout << "The engine had a white win percentage of " << (double)numWhiteWins / numTrials * 100
+            << "% and a draw percentage of " << (double)numDraws / numTrials * 100 << "% with " << timeToUse \
             << "s per move over " << numTrials << " trials.\n" << std::flush;
 }
 
@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
     int d = 3;
     std::cout << "Conducting tests with n=" << n << ", d=" << d << ".\n" << std::flush;
     std::cout << "Testing correctness:\n" << std::flush;
-    testCorrectness(5, 1, 3, 3);
+    testCorrectness(5, 1, n, d);
     std::cout << "Testing VPS:\n" << std::flush;
-    testVPS(5, 1, 3, 3);
+    testVPS(5, 1, n, d);
     std::cout << "Done!\n" << std::flush;
 }
