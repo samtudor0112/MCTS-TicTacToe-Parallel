@@ -30,3 +30,9 @@ std::string State::getStringBoard() {
 PlayerColour State::getTurn() {
     return turn;
 }
+
+// A totally decorative wrapper to free our board's boards
+void State::freeBoards() {
+    board.freeBoards();
+}
+ 
