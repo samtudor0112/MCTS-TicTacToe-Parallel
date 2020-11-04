@@ -9,8 +9,8 @@
 class TicTacToe {
 private:
     // Our board is is actually 2 boards, the white and black boards. 1 corresponds to a taken square.
-    int[] whiteBoard;
-    int[] blackBoard;
+    std::vector<int> whiteBoard;
+    std::vector<int> blackBoard;
 
     int n;
     int d;
@@ -22,10 +22,12 @@ private:
     void updateGameStatus(PlayerColour lastTurn, int lastPosition);
 public:
     TicTacToe(int n, int d);
-    TicTacToe(int n, int d, int[] _whiteBoard, int[] _blackBoard);
+    TicTacToe(int n, int d, std::vector<int> _whiteBoard, std::vector<int> _blackBoard, int numMoves);
     std::vector<TicTacToe> getAllLegalMoveStates(PlayerColour turn);
     std::string boardToString();
     GameStatus getGameStatus();
+    ~TicTacToe();
+    int getSize();
 };
 
 

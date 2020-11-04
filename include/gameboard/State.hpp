@@ -21,10 +21,9 @@ private:
     TicTacToe board;
 
     PlayerColour turn;
-    void updateGameStatus();
 
 public:
-    State();
+    State(int n, int d);
     State(PlayerColour turn, TicTacToe board);
     GameStatus getGameStatus();
     std::vector<State> getAllLegalMoveStates();

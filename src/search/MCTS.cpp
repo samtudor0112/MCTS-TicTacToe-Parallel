@@ -128,12 +128,10 @@ State MCTS::getBestMoveFromFinishedTree() {
 }
 
 // Manually clean up the pointers to all the nodes of the tree. Iteratively deletes every non-root node.
+// Also cleans up all the boards of the boards of the states of all the nodes. What a mouthful.
 void MCTS::cleanUpNodes() {
-    // We can't delete the root so the starting nodes are the root's children.
     std::deque<Node*> nodeStack;
-    for (Node* child: *(root.getChildNodes())) {
-        nodeStack.push_back(child);
-    }
+    nodeStack.push_back(&root);
 
     while(!nodeStack.empty()) {
         Node* toDelete = nodeStack.back();
@@ -141,8 +139,11 @@ void MCTS::cleanUpNodes() {
         for (Node* child: *(toDelete->getChildNodes())) {
             nodeStack.push_back(child);
         }
-        toDelete->getState().freeBoards();
-        delete toDelete;
+
+        // We can't delete the root
+        if (toDelete != &root) {
+            delete toDelete;
+        }
     }
 }
 

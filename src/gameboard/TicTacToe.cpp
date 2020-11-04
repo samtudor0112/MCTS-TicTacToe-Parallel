@@ -1,3 +1,5 @@
+#include <cstring>
+#include <iterator>
 #include "../../include/gameboard/TicTacToe.hpp"
 
 TicTacToe::TicTacToe(int n, int d) {
@@ -5,16 +7,16 @@ TicTacToe::TicTacToe(int n, int d) {
     this->n = n;
     this->d = d;
 
-    int size = pow(n, d);
-    this->whiteBoard = calloc(size, sizeof(int));
-    this->blackBoard = calloc(size, sizeof(int));
+    int size = getSize();
+    whiteBoard = std::vector<int>(size, 0);
+    blackBoard = std::vector<int>(size, 0);
 
     this->numMoves = 0;
 
-    this->gameStatus = inProgress;
+    this->status = inProgress;
 }
 
-TicTacToe::TicTacToe(int n, int d, int[] _whiteBoard, int[] _blackBoard, int _numMoves) {
+TicTacToe::TicTacToe(int n, int d, std::vector<int> _whiteBoard, std::vector<int> _blackBoard, int _numMoves) {
     this->n = n;
     this->d = d;
 
@@ -26,25 +28,32 @@ TicTacToe::TicTacToe(int n, int d, int[] _whiteBoard, int[] _blackBoard, int _nu
 
 // Returns a vector of all TicTacToe boards possible after one legal move by the player whose turn it is.
 std::vector<TicTacToe> TicTacToe::getAllLegalMoveStates(PlayerColour turn) {
-    int size = pow(n, d);
+    int size = getSize();
     std::vector<TicTacToe> out = std::vector<TicTacToe>();
-    int[] newBoard;
-    int[] oldBoard = turn == white ? whiteBoard : blackBoard;
-    int[] otherBoard = turn == white ? blackBoard : whiteBoard;
+    // We try this to improve the time spent in push_back
+    out.reserve(size - numMoves);
+    std::vector<int>* oldBoard = turn == white ? &whiteBoard : &blackBoard;
+    std::vector<int> newBoard;
+
+    std::vector<int>* otherBoard = turn == white ? &blackBoard : &whiteBoard;
+    std::vector<int> otherBoardCopy;
 
     for (int i = 0; i < size; i++) {
-        if (oldBoard[i] == 0 && otherBoard[i] == 0) {
-            newBoard = malloc(sizeof(int) * size);
-            memcpy(newBoard, oldBoard, sizeof(int) * size);
+        if ((*oldBoard)[i] == 0 && (*otherBoard)[i] == 0) {
+            newBoard = *oldBoard;
             newBoard[i] = 1;
-            TicTacToe newGame;
+            otherBoardCopy = *otherBoard;
+
             if (turn == white) {
-                newGame = TicTacToe(n, d, newBoard, otherBoard, numMoves + 1);
+                TicTacToe newGame = TicTacToe(n, d, newBoard, otherBoardCopy, numMoves + 1);
+                newGame.updateGameStatus(turn, i);
+                out.push_back(newGame);
             } else {
-                newGame =  TicTacToe(n, d, otherBoard, newBoard, numMoves + 1);
+                TicTacToe newGame = TicTacToe(n, d, otherBoardCopy, newBoard, numMoves + 1);
+                newGame.updateGameStatus(turn, i);
+                out.push_back(newGame);
             }
-            newGame.updateGameStatus(turn, i);
-            out.push_back(newGame);
+
         }
     }
     return out;
@@ -52,10 +61,10 @@ std::vector<TicTacToe> TicTacToe::getAllLegalMoveStates(PlayerColour turn) {
 
 // Determines whether the player of colour lastTurn has won, whether the game is drawn, or still ongoing. The last move was at position lastPosition.
 void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
-    int size = pow(n, d);
+    int size = getSize();
     // We only check this board for a win
-    int[] board = lastTurn == white ? whiteBoard : blackBoard;
-    gameStatus win = lastTurn == white ? whiteWin : blackWin;
+    std::vector<int>* board = lastTurn == white ? &whiteBoard : &blackBoard;
+    GameStatus win = lastTurn == white ? whiteWin : blackWin;
 
     // Check every row, column, diagonal to see if someone has won
     // This only works for d=3. Solving the generalized problem for any d is nontrivially difficult, and is not the point of this project
@@ -64,13 +73,12 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
     int lastY = (lastPosition / n) % n;
     int lastZ = lastPosition / (n * n);
 
-
     // Single direction lines
     int completed_line = 1;
 
     for (int i = 0; i < n; i++) {
         // X line
-        if(board[i + lastY * n + lastZ * n * n] == 0) {
+        if((*board)[i + lastY * n + lastZ * n * n] == 0) {
             // We could use a goto here but... yea
             completed_line = 0;
             break;
@@ -85,7 +93,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
     for (int i = 0; i < n; i++) {
         // Y line
-        if(board[lastX + i * n + lastZ * n * n] == 0) {
+        if((*board)[lastX + i * n + lastZ * n * n] == 0) {
             // We could use a goto here but... yea
             completed_line = 0;
             break;
@@ -97,11 +105,11 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
     }
 
 
-    int completed_line = 1;
+    completed_line = 1;
 
     for (int i = 0; i < n; i++) {
         // Z line
-        if(board[lastX + lastY * n + i * n * n] == 0) {
+        if((*board)[lastX + lastY * n + i * n * n] == 0) {
             // We could use a goto here but... yea
             completed_line = 0;
             break;
@@ -118,7 +126,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // X-Y diagonal
-            if(board[i + i * n + lastZ * n * n] == 0) {
+            if((*board)[i + i * n + lastZ * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -135,7 +143,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // X-Z diagonal
-            if(board[i + lastY * n + i * n * n] == 0) {
+            if((*board)[i + lastY * n + i * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -152,7 +160,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Y-Z diagonal
-            if(board[lastX + i * n + i * n * n] == 0) {
+            if((*board)[lastX + i * n + i * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -169,7 +177,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Other X-Y diagonal
-            if(board[i + (n - i - 1) * n + lastZ * n * n] == 0) {
+            if((*board)[i + (n - i - 1) * n + lastZ * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -177,7 +185,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
         }
         if (completed_line) {
             this->status = win;
-            return
+            return;
         }
     } 
 
@@ -186,7 +194,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Other X-Z diagonal
-            if(board[i + lastY * n + (n - i - 1) * n * n] == 0) {
+            if((*board)[i + lastY * n + (n - i - 1) * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -203,7 +211,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Other Y-Z diagonal
-            if(board[lastX + i * n + (n - i - 1) * n * n] == 0) {
+            if((*board)[lastX + i * n + (n - i - 1) * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -221,7 +229,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // X-Y-Z diagonal
-            if(board[i + i * n + i * n * n] == 0) {
+            if((*board)[i + i * n + i * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -238,7 +246,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Next X-Y-Z diagonal
-            if(board[i + i * n + (n - i - 1) * n * n] == 0) {
+            if((*board)[i + i * n + (n - i - 1) * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -255,7 +263,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Another X-Y-Z diagonal
-            if(board[i + (n - i - 1) * n + i * n * n] == 0) {
+            if((*board)[i + (n - i - 1) * n + i * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -272,7 +280,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
         for (int i = 0; i < n; i++) {
             // Last X-Y-Z diagonal
-            if(board[i + (n - i - 1) * n + (n - i - 1) * n * n] == 0) {
+            if((*board)[i + (n - i - 1) * n + (n - i - 1) * n * n] == 0) {
                 // We could use a goto here but... yea
                 completed_line = 0;
                 break;
@@ -290,32 +298,63 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
 
 // Returns a (crappy) string representation of the current board.
 std::string TicTacToe::boardToString() {
-    std::string out = "-------\n";
-    for (int i = 0; i < 3; i++) {
-        out += '|';
-        for (int j = 0; j < 3; j++) {
-            char c;
-            if (board[j + i * 3] == 0) {
-                c = ' ';
-            } else if (board[j + i * 3] == 1) {
-                c = 'O';
-            } else {
-                c = 'X';
-            }
-            out += c;
-            out += '|';
-        }
-        out += '\n';
-        out += "-------\n";
+//    std::string out = "-------\n";
+//    for (int i = 0; i < 3; i++) {
+//        out += '|';
+//        for (int j = 0; j < 3; j++) {
+//            char c;
+//            if (board[j + i * 3] == 0) {
+//                c = ' ';
+//            } else if (board[j + i * 3] == 1) {
+//                c = 'O';
+//            } else {
+//                c = 'X';
+//            }
+//            out += c;
+//            out += '|';
+//        }
+//        out += '\n';
+//        out += "-------\n";
+//    }
+//    return out;
+    if (n != 3 || d != 3) {
+        return "Woops!\n";
     }
-    return out;
+    std::string out = "";
+    for (int i = 0; i < 3; i++) {
+        out += "Layer ";
+        out += std::to_string(i + 1);
+        out += "\n-------\n";
+        for (int j = 0; j < 3; j++) {
+            out += '|';
+            for (int k = 0; k < 3; k++) {
+                char c;
+                if (whiteBoard[k + j * 3 + i * 9] == 1) {
+                    c = 'O';
+                } else if (blackBoard[k + j * 3 + i * 9] == 1) {
+                    c = 'X';
+                } else {
+                    c = ' ';
+                }
+                out += c;
+                out += '|';
+            }
+            out += '\n';
+            out += "-------\n";
+        }
+    }
+    return out + "\n";
 }
 
 GameStatus TicTacToe::getGameStatus() {
     return this->status;
 }
 
-void TicTacToe::freeBoards() {
-    free(whiteBoard);
-    free(blackBoard);
+int TicTacToe::getSize() {
+    return pow(n, d);
+}
+
+TicTacToe::~TicTacToe() {
+//    delete[] whiteBoard;
+//    delete[] blackBoard;
 }

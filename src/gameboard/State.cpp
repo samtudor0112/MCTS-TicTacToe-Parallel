@@ -11,6 +11,8 @@ GameStatus State::getGameStatus() {
 std::vector<State> State::getAllLegalMoveStates() {
     std::vector<State> out = std::vector<State>();
     std::vector<TicTacToe> boards = board.getAllLegalMoveStates(turn);
+    // We try this to improve the time spent in push_back
+    out.reserve(boards.size());
     for(TicTacToe board: boards) {
         out.push_back(State(otherPlayer(turn), board));
     }
@@ -30,9 +32,3 @@ std::string State::getStringBoard() {
 PlayerColour State::getTurn() {
     return turn;
 }
-
-// A totally decorative wrapper to free our board's boards
-void State::freeBoards() {
-    board.freeBoards();
-}
- 
