@@ -314,3 +314,8 @@ std::string TicTacToe::boardToString() {
 GameStatus TicTacToe::getGameStatus() {
     return this->status;
 }
+
+void TicTacToe::freeBoards() {
+    free(whiteBoard);
+    free(blackBoard);
+}
