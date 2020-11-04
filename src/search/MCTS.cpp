@@ -141,6 +141,7 @@ void MCTS::cleanUpNodes() {
         for (Node* child: *(toDelete->getChildNodes())) {
             nodeStack.push_back(child);
         }
+        toDelete->getState().freeBoards();
         delete toDelete;
     }
 }
