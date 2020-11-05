@@ -58,7 +58,7 @@ Node* MCTS::selectAndExpandNewNode() {
 void MCTS::expandNode(Node* parent) {
     State boardState = parent->getState();
     std::vector<State> validMoves = boardState.getAllLegalMoveStates();
-    for (State state: validMoves) {
+    for (const State& state: validMoves) {
         Node* newNode = new Node(state);
         newNode->setParent(parent);
         parent->addChildNode(newNode);

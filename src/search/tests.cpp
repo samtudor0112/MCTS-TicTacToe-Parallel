@@ -36,6 +36,7 @@ void testVPS(int numTrials, double timeToUse, int n, int d) {
 int main(int argc, char** argv) {
     int n = 3;
     int d = 3;
+    std::cout << "Program version: Serial (optimised).\n" << std::flush;
     std::cout << "Conducting tests with n=" << n << ", d=" << d << ".\n" << std::flush;
     std::cout << "Testing correctness:\n" << std::flush;
     testCorrectness(5, 1, n, d);
