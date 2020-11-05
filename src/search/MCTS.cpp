@@ -22,7 +22,7 @@ State MCTS::getBestMove(int* finalVisits) {
     auto endTime = startTime + std::chrono::duration<double>(timeLimit);
     Node* finalRoot;
 
-#pragma omp parallel num_threads(numThreads);
+#pragma omp parallel num_threads(numThreads)
     {
         Node* root = roots[omp_get_thread_num()];
         while (std::chrono::system_clock::now() < endTime) {

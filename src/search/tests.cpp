@@ -2,12 +2,12 @@
 #include "../../include/gameboard/State.hpp"
 #include "../../include/search/PlayGame.hpp"
 
-void testCorrectness(int numTrials, double timeToUse, int n, int d) {
+void testCorrectness(int numTrials, double timeToUse, int n, int d, int numThreads) {
     int numWhiteWins = 0;
     int numDraws = 0;
     for (int i = 0; i < numTrials; i++) {
         State currentState = State(n, d);
-        GameStatus result = play_game(currentState, timeToUse, false, 1);
+        GameStatus result = play_game(currentState, timeToUse, false, numThreads);
         if (result == draw) {
             numDraws++;
         } else if (result == whiteWin) {
@@ -20,11 +20,11 @@ void testCorrectness(int numTrials, double timeToUse, int n, int d) {
             << "s per move over " << numTrials << " trials.\n" << std::flush;
 }
 
-void testVPS(int numTrials, double timeToUse, int n, int d) {
+void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
     double vps = 0;
     for (int i = 0; i < numTrials; i++) {
         State currentState = State(n,d);
-        double vps_trial = play_game_vps(currentState, timeToUse, false, 1);
+        double vps_trial = play_game_vps(currentState, timeToUse, false, numThreads);
         vps += vps_trial;
     }
 
@@ -36,10 +36,12 @@ void testVPS(int numTrials, double timeToUse, int n, int d) {
 int main(int argc, char** argv) {
     int n = 3;
     int d = 3;
+    int numThreads = 4;
+    std::cout << "Program version: OpenMP parallelisation. Number of threads: " << numThreads << ".\n" << std::flush;
     std::cout << "Conducting tests with n=" << n << ", d=" << d << ".\n" << std::flush;
     std::cout << "Testing correctness:\n" << std::flush;
-    testCorrectness(5, 1, n, d);
+    testCorrectness(5, 1, n, d, numThreads);
     std::cout << "Testing VPS:\n" << std::flush;
-    testVPS(5, 1, n, d);
+    testVPS(5, 1, n, d, numThreads);
     std::cout << "Done!\n" << std::flush;
 }
