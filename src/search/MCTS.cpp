@@ -1,13 +1,12 @@
 #include "../../include/search/MCTS.hpp"
 #include <chrono>
-#include <algorithm>
 #include <functional>
-#include <iostream>
 #include <stack>
+#include <utility>
 
 // We assume that we are the player who's colour's turn it is in the startState.
 MCTS::MCTS(State startState, double timeLimit) :
-        timeLimit(timeLimit), root(Node(startState)) {}
+        timeLimit(timeLimit), root(Node(std::move(startState))) {}
 
 // Executes the MCTS search. Takes slightly longer than timeLimit.
 // Will return the approximately best State object which is the result of the best move.
@@ -31,7 +30,7 @@ Node* MCTS::selectAndExpandNewNode() {
     Node* node = &this->root;
 
     // Traverse the tree, selecting the best UCT score each time, until we have a leaf node
-    while (node->getChildNodes()->size()) {
+    while (!node->getChildNodes()->empty()) {
         int parentVisits = node->getVisits();
         double maxScore = -1;
         Node* newNode;
@@ -128,12 +127,10 @@ State MCTS::getBestMoveFromFinishedTree() {
 }
 
 // Manually clean up the pointers to all the nodes of the tree. Iteratively deletes every non-root node.
+// Also cleans up all the boards of the boards of the states of all the nodes. What a mouthful.
 void MCTS::cleanUpNodes() {
-    // We can't delete the root so the starting nodes are the root's children.
     std::deque<Node*> nodeStack;
-    for (Node* child: *(root.getChildNodes())) {
-        nodeStack.push_back(child);
-    }
+    nodeStack.push_back(&root);
 
     while(!nodeStack.empty()) {
         Node* toDelete = nodeStack.back();
@@ -141,7 +138,11 @@ void MCTS::cleanUpNodes() {
         for (Node* child: *(toDelete->getChildNodes())) {
             nodeStack.push_back(child);
         }
-        delete toDelete;
+
+        // We can't delete the root
+        if (toDelete != &root) {
+            delete toDelete;
+        }
     }
 }
 

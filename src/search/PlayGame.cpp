@@ -1,11 +1,12 @@
 #include <iostream>
+#include <utility>
 #include "../../include/search/PlayGame.hpp"
 #include "../../include/search/MCTS.hpp"
 
 // Plays a game of Tic Tac Toe against itself, with each playing having timeToUse seconds to play each move
 // Returns the result of the game
 GameStatus play_game(State startState, double timeToUse, bool print) {
-    State currentState = startState;
+    State currentState = std::move(startState);
     while(true) {
         MCTS search = MCTS(currentState, timeToUse);
         State bestMove = search.getBestMove();
@@ -21,7 +22,7 @@ GameStatus play_game(State startState, double timeToUse, bool print) {
 // Plays a game of Tic Tac Toe against itself, with each playing having timeToUse seconds to play each move
 // Returns the average VPS / turn of the search
 double play_game_vps(State startState, double timeToUse, bool print) {
-    State currentState = startState;
+    State currentState = std::move(startState);
     double sumVps = 0.0;
     int numMoves = 0;
     while(true) {
