@@ -34,17 +34,19 @@ void testVPS(int numTrials, double timeToUse, int n, int d) {
 
 // Tests the engine for correctness and VPS (visits/second).
 int main(int argc, char** argv) {
-    if (argc != 3) {
+    if (argc != 5) {
         std::cout << "Invalid arguments" << std::flush;
         return 1;
     }
     int n = std::stoi(argv[1]);
     int d = std::stoi(argv[2]);
+    int numTrials = std::stoi(argv[3]);
+    double timeToUse = std::stod(argv[4]);
     std::cout << "Program version: Serial (optimised).\n" << std::flush;
     std::cout << "Conducting tests with n=" << n << ", d=" << d << ".\n" << std::flush;
     std::cout << "Testing correctness:\n" << std::flush;
-    testCorrectness(5, 1, n, d);
+    testCorrectness(numTrials, timeToUse, n, d);
     std::cout << "Testing VPS:\n" << std::flush;
-    testVPS(5, 1, n, d);
+    testVPS(numTrials, timeToUse, n, d);
     std::cout << "Done!\n" << std::flush;
 }
