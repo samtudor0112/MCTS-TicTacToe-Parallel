@@ -34,18 +34,20 @@ void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
 
 // Tests the engine for correctness and VPS (visits/second).
 int main(int argc, char** argv) {
-    if (argc != 4) {
+    if (argc != 6) {
         std::cout << "Invalid arguments" << std::flush;
         return 1;
     }
     int n = std::stoi(argv[1]);
     int d = std::stoi(argv[2]);
-    int numThreads = std::stoi(argv[3]);
+    int numTrials = std::stoi(argv[3]);
+    double timeToUse = std::stod(argv[4]);
+    int numThreads = std::stoi(argv[5]);
     std::cout << "Program version: OpenMP parallelisation. Number of threads: " << numThreads << ".\n" << std::flush;
     std::cout << "Conducting tests with n=" << n << ", d=" << d << ".\n" << std::flush;
     std::cout << "Testing correctness:\n" << std::flush;
-    testCorrectness(5, 1, n, d, numThreads);
+    testCorrectness(numTrials, timeToUse, n, d, numThreads);
     std::cout << "Testing VPS:\n" << std::flush;
-    testVPS(5, 1, n, d, numThreads);
+    testVPS(numTrials, timeToUse, n, d, numThreads);
     std::cout << "Done!\n" << std::flush;
 }
