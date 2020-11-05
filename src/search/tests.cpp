@@ -32,7 +32,7 @@ void testVPS(int numTrials, double timeToUse, int n, int d) {
             << "s per move over " << numTrials << " trials.\n" << std::flush;
 }
 
-// The main entry point of the program. Currently plays a game with 3 second time limit and prints the board
+// Tests the engine for correctness and VPS (visits/second).
 int main(int argc, char** argv) {
     int n = 3;
     int d = 3;

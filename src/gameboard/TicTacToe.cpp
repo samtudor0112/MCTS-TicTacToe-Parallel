@@ -60,7 +60,8 @@ std::vector<TicTacToe> TicTacToe::getAllLegalMoveStates(PlayerColour turn) {
     return out;
 }
 
-// Determines whether the player of colour lastTurn has won, whether the game is drawn, or still ongoing. The last move was at position lastPosition.
+// Determines whether the player of colour lastTurn has won, whether the game is drawn, or still ongoing.
+// The last move was at index lastPosition in the board.
 void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
     int size = getSize();
     // We only check this board for a win
@@ -68,7 +69,8 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
     GameStatus win = lastTurn == white ? whiteWin : blackWin;
 
     // Check every row, column, diagonal to see if someone has won
-    // This only works for d=3. Solving the generalized problem for any d is nontrivially difficult, and is not the point of this project
+    // This only works for d=3. Implementing a solution for the generalized problem for any d is nontrivially
+    // difficult, and is not the point of this project
     // Being able to vary to any n gives us sufficient scalability of the problem to test our program.
     int lastX = lastPosition % n;
     int lastY = (lastPosition / n) % n;
@@ -321,6 +323,7 @@ std::string TicTacToe::boardToString() {
     if (n != 3 || d != 3) {
         return "Woops!\n";
     }
+    // This only works for n=3, d=3
     std::string out = "";
     for (int i = 0; i < 3; i++) {
         out += "Layer ";
@@ -351,6 +354,7 @@ GameStatus TicTacToe::getGameStatus() {
     return this->status;
 }
 
+// Returns the size of the board
 int TicTacToe::getSize() const {
     return pow(n, d);
 }

@@ -3,7 +3,7 @@
 #include "../../include/search/PlayGame.hpp"
 #include "../../include/search/MCTS.hpp"
 
-// Plays a game of Tic Tac Toe against itself, with each playing having timeToUse seconds to play each move
+// Plays a game of Tic Tac Toe against itself, with each player having timeToUse seconds to play each move
 // Returns the result of the game
 GameStatus play_game(State startState, double timeToUse, bool print) {
     State currentState = std::move(startState);
@@ -19,8 +19,8 @@ GameStatus play_game(State startState, double timeToUse, bool print) {
         currentState = bestMove;
     }
 }
-// Plays a game of Tic Tac Toe against itself, with each playing having timeToUse seconds to play each move
-// Returns the average VPS / turn of the search
+// Plays a game of Tic Tac Toe against itself, with each player having timeToUse seconds to play each move
+// Returns the VPS averaged over every turn of the search
 double play_game_vps(State startState, double timeToUse, bool print) {
     State currentState = std::move(startState);
     double sumVps = 0.0;

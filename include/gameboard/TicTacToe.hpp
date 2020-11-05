@@ -5,18 +5,23 @@
 #include <array>
 #include "common.hpp"
 
-// Defines the rules of Tic Tac Toe
+// Defines the rules of Hypercube Tic Tac Toe
 class TicTacToe {
 private:
-    // Our board is is actually 2 boards, the white and black boards. 1 corresponds to a taken square.
+    // Our board is actually 2 boards, the white and black boards. 1 corresponds to a taken square.
+    // These boards are of size n^d.
     std::vector<int> whiteBoard;
     std::vector<int> blackBoard;
 
+    // The length of a single side of the board
     int n;
+    // The number of dimensions of the board
     int d;
 
+    // The number of moves occurring before this board
     int numMoves;
 
+    // The status of the board
     GameStatus status;
 
     void updateGameStatus(PlayerColour lastTurn, int lastPosition);
