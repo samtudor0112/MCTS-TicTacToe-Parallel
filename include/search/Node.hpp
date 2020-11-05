@@ -36,6 +36,7 @@ public:
     int getVisits();
     double getReward();
     void addChildNode(Node* node);
+    void setVisits(int _visits);
 };
 
 

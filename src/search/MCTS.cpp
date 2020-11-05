@@ -1,33 +1,53 @@
 #include "../../include/search/MCTS.hpp"
+#include "../../include/gameboard/hashes.hpp"
 #include <chrono>
 #include <functional>
 #include <stack>
 #include <utility>
+#include <omp.h>
+#include <unordered_set>
 
 // We assume that we are the player who's colour's turn it is in the startState.
-MCTS::MCTS(State startState, double timeLimit) :
-        timeLimit(timeLimit), root(Node(std::move(startState))) {}
+MCTS::MCTS(const State& startState, double timeLimit, int numThreads) :
+        timeLimit(timeLimit), numThreads(numThreads) {
+    for (int i = 0; i < numThreads; i++) {
+        roots.emplace_back(new Node(startState));
+    }
+}
 
 // Executes the MCTS search. Takes slightly longer than timeLimit.
 // Will return the approximately best State object which is the result of the best move.
-State MCTS::getBestMove() {
+State MCTS::getBestMove(int* finalVisits) {
     auto startTime = std::chrono::system_clock::now();
     auto endTime = startTime + std::chrono::duration<double>(timeLimit);
+    Node* finalRoot;
 
-    while (std::chrono::system_clock::now() < endTime) {
-        Node* newNode = selectAndExpandNewNode();
-        GameStatus playoutResult = simulatePlayout(newNode);
-        backPropagateResult(newNode, playoutResult);
+#pragma omp parallel num_threads(numThreads);
+    {
+        Node* root = roots[omp_get_thread_num()];
+        while (std::chrono::system_clock::now() < endTime) {
+            Node* newNode = selectAndExpandNewNode(root);
+            GameStatus playoutResult = simulatePlayout(newNode);
+            backPropagateResult(newNode, playoutResult);
+        }
+#pragma omp barrier
+#pragma omp master
+        {
+            finalRoot = combineTrees(finalVisits);
+        }
+#pragma omp barrier
+        // We make our own finalRoot so we can clean up all the other roots' trees
+        cleanUpNodes(roots[omp_get_thread_num()]);
     }
+    return getBestMoveFromFinishedTree(finalRoot);
 
-    return getBestMoveFromFinishedTree();
 }
 
 // The select component of the MCTS algorithm. Also calls the expand component of the MCTS algorithm if necessary.
 // Iteratively selects the best node to playout based off the UCT formula.
-Node* MCTS::selectAndExpandNewNode() {
+Node* MCTS::selectAndExpandNewNode(Node* root) {
     // We start at the root
-    Node* node = &this->root;
+    Node* node = root;
 
     // Traverse the tree, selecting the best UCT score each time, until we have a leaf node
     while (!node->getChildNodes()->empty()) {
@@ -107,12 +127,48 @@ void MCTS::backPropagateResult(Node* node, GameStatus playoutResult) {
     }
 }
 
+// Combines all the trees of each thread into one tree to determine the best move.
+// We assign to the value of finalVisits since we're lazy
+Node* MCTS::combineTrees(int* finalVisits) {
+    // All we need is the root Node, and it's children, which only need the correct number of visits. Anything else can
+    // be undefined
+    Node* finalRoot = new Node(roots[0]->getState());
+
+    // Only stores 1 copy of each state
+    std::unordered_map<State, int, state_hash> childStates;
+    for (Node* root: roots) {
+        for (Node* child: *(root->getChildNodes())) {
+            if (childStates.find(child->getState()) == childStates.end()) {
+                childStates[child->getState()] = child->getVisits();
+            } else {
+                childStates[child->getState()] += child->getVisits();
+            }
+        }
+    }
+
+    for (const auto& stateVistsPair: childStates) {
+        Node* newChild = new Node(stateVistsPair.first);
+        newChild->setVisits(stateVistsPair.second);
+        finalRoot->addChildNode(newChild);
+    }
+
+    if (finalVisits != nullptr) {
+        *finalVisits = 0;
+        // We actually have to manually calculate the final visits since what finalRoot reports will be 0.
+        for (Node* child: *(finalRoot->getChildNodes())) {
+            *finalVisits += child->getVisits();
+        }
+    }
+
+    return finalRoot;
+}
+
 // Returns the approximately best State to move to from the root. Will be null if starting at a won/lost/drawn position
-State MCTS::getBestMoveFromFinishedTree() {
+State MCTS::getBestMoveFromFinishedTree(Node* finalRoot) {
     int maxVisits = -1;
     Node* bestNode;
     // Find the node with max visits value
-    for (Node* find_node: *(root.getChildNodes())) {
+    for (Node* find_node: *(finalRoot->getChildNodes())) {
         int val = find_node->getVisits();
         if (val > maxVisits) {
             maxVisits = val;
@@ -121,16 +177,17 @@ State MCTS::getBestMoveFromFinishedTree() {
     }
     // Grab the best state before cleaning up our nodes
     State bestState = bestNode->getState();
-    cleanUpNodes();
+
+    cleanUpNodes(finalRoot);
 
     return bestState;
 }
 
 // Manually clean up the pointers to all the nodes of the tree. Iteratively deletes every non-root node.
 // Also cleans up all the boards of the boards of the states of all the nodes. What a mouthful.
-void MCTS::cleanUpNodes() {
+void MCTS::cleanUpNodes(Node* root) {
     std::deque<Node*> nodeStack;
-    nodeStack.push_back(&root);
+    nodeStack.push_back(root);
 
     while(!nodeStack.empty()) {
         Node* toDelete = nodeStack.back();
@@ -139,10 +196,10 @@ void MCTS::cleanUpNodes() {
             nodeStack.push_back(child);
         }
 
-        // We can't delete the root
-        if (toDelete != &root) {
-            delete toDelete;
-        }
+//        // We can't delete the root
+//        if (toDelete != root) {
+//            delete toDelete;
+//        }
     }
 }
 
@@ -157,8 +214,4 @@ double MCTS::UCTValue(Node* node, int parentVisits) {
 
     return node->getReward() / (double) node->getVisits()
             + sqrt(2.0 * log(parentVisits) / (double) node->getVisits());
-}
-
-Node* MCTS::getRoot() {
-    return &root;
 }

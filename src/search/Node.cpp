@@ -35,5 +35,8 @@ void Node::addChildNode(Node* node) {
     this->childNodes.push_back(node);
 }
 
+void Node::setVisits(int _visits) {
+    this->visits = _visits;
+}
 
 

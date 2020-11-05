@@ -8,7 +8,7 @@
 int main(int argc, char** argv) {
     std::cout << "Start\n" << std::flush;
     State currentState = State(3, 3);
-    play_game(currentState, 1, true);
+    play_game(currentState, 1, true, 1);
     std::cout << "Done!\n" << std::flush;
 }
 

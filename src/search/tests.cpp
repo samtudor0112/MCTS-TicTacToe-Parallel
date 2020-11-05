@@ -7,7 +7,7 @@ void testCorrectness(int numTrials, double timeToUse, int n, int d) {
     int numDraws = 0;
     for (int i = 0; i < numTrials; i++) {
         State currentState = State(n, d);
-        GameStatus result = play_game(currentState, timeToUse, false);
+        GameStatus result = play_game(currentState, timeToUse, false, 1);
         if (result == draw) {
             numDraws++;
         } else if (result == whiteWin) {
@@ -24,7 +24,7 @@ void testVPS(int numTrials, double timeToUse, int n, int d) {
     double vps = 0;
     for (int i = 0; i < numTrials; i++) {
         State currentState = State(n,d);
-        double vps_trial = play_game_vps(currentState, timeToUse, false);
+        double vps_trial = play_game_vps(currentState, timeToUse, false, 1);
         vps += vps_trial;
     }
 

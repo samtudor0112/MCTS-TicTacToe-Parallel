@@ -29,6 +29,15 @@ std::string State::getStringBoard() {
     return board.boardToString();
 }
 
-PlayerColour State::getTurn() {
+PlayerColour State::getTurn() const {
     return turn;
+}
+
+TicTacToe State::getBoard() const {
+    return board;
+}
+
+// I'm writing this like java because I don't know how overloading comparison operators works
+bool State::operator==(const State& s2) const {
+    return turn == s2.turn && board == s2.board;
 }

@@ -12,24 +12,26 @@
 // See report for explanation of MCTS algorithm.
 class MCTS {
 private:
-    Node root;
+    std::vector<Node*> roots;
+    int numThreads;
+
     double timeLimit;
 
     // 4 Steps of the MCTS algorithm
-    Node* selectAndExpandNewNode();
+    Node* selectAndExpandNewNode(Node* root);
     void expandNode(Node* parent);
     GameStatus simulatePlayout(Node* node);
     void backPropagateResult(Node* node, GameStatus playoutResult);
 
     // Other supporting functions
     static double UCTValue(Node* node, int parentVisits);
-    void cleanUpNodes();
+    void cleanUpNodes(Node* root);
     double getReward(PlayerColour nodeColour, GameStatus result);
-    State getBestMoveFromFinishedTree();
+    State getBestMoveFromFinishedTree(Node* finalRoot);
+    Node* combineTrees(int* finalVisits);
 public:
-    MCTS(State startState, double timeLimit);
-    State getBestMove();
-    Node* getRoot();
+    MCTS(const State& startState, double timeLimit, int numThreads);
+    State getBestMove(int* finalVisits);
 };
 
 

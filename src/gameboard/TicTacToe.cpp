@@ -359,6 +359,22 @@ int TicTacToe::getSize() const {
     return pow(n, d);
 }
 
+// Checks if two boards are the same, just check size and tokens
+bool TicTacToe::operator==(const TicTacToe& t2) const {
+    return n == t2.n && d == t2.d && whiteBoard == t2.whiteBoard && blackBoard == t2.blackBoard;
+}
+
+std::vector<int> TicTacToe::getWhiteBoard() const{
+    return whiteBoard;
+}
+
+std::vector<int> TicTacToe::getBlackBoard() const{
+    return blackBoard;
+}
+
+
+
+
 TicTacToe::~TicTacToe() {
 //    delete[] whiteBoard;
 //    delete[] blackBoard;

@@ -29,4 +29,6 @@ Iter select_randomly(Iter start, Iter end) {
 }
 
 
+
+
 #endif //SERIAL_COMMON_HPP
