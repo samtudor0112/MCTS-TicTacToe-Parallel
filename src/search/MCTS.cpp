@@ -37,7 +37,7 @@ State MCTS::getBestMove(int* finalVisits) {
         }
 #pragma omp barrier
         // We make our own finalRoot so we can clean up all the other roots' trees
-        cleanUpNodes(roots[omp_get_thread_num()]);
+        cleanUpNodes(root);
     }
     return getBestMoveFromFinishedTree(finalRoot);
 
@@ -196,10 +196,9 @@ void MCTS::cleanUpNodes(Node* root) {
             nodeStack.push_back(child);
         }
 
-//        // We can't delete the root
-//        if (toDelete != root) {
-//            delete toDelete;
-//        }
+        // We can delete it even if it's the root now
+        delete toDelete;
+
     }
 }
 
