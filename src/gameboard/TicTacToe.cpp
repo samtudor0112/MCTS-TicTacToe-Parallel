@@ -190,7 +190,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
             this->status = win;
             return;
         }
-    } 
+    }
 
     if (lastX == n - lastZ - 1) {
         completed_line = 1;
@@ -207,7 +207,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
             this->status = win;
             return;
         }
-    } 
+    }
 
     if (lastY == n - lastZ - 1) {
         completed_line = 1;
@@ -372,7 +372,9 @@ std::vector<int> TicTacToe::getBlackBoard() const{
     return blackBoard;
 }
 
-
+int TicTacToe::getNumMoves() const {
+    return numMoves;
+}
 
 
 TicTacToe::~TicTacToe() {

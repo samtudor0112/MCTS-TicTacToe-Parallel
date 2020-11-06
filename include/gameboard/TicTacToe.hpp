@@ -36,6 +36,7 @@ public:
     bool operator==(const TicTacToe& t2) const;
     std::vector<int> getWhiteBoard() const;
     std::vector<int> getBlackBoard() const;
+    int getNumMoves() const;
 };
 
 
