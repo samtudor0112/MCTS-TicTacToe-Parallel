@@ -63,8 +63,10 @@ State MCTS::getBestMove(int* finalVisits) {
         Node* processRoot = buildSearchTree(finalVisits);
         sendTree(processRoot);
 
-        // Send the final visits
-        MPI_Reduce(finalVisits, nullptr, 1, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+        if (finalVisits != nullptr) {
+            // Send the final visits
+            MPI_Reduce(finalVisits, nullptr, 1, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+        }
 
         // Receive the final state to return
         State out = bcast_state_in(processRoot->getState().getBoard().getN(), processRoot->getState().getBoard().getD(), MASTER_RANK, MPI_COMM_WORLD);
