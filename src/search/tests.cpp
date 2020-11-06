@@ -1,4 +1,5 @@
 #include <iostream>
+#include <mpi.h>
 #include "../../include/gameboard/State.hpp"
 #include "../../include/search/PlayGame.hpp"
 
@@ -34,6 +35,8 @@ void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
 
 // Tests the engine for correctness and VPS (visits/second).
 int main(int argc, char** argv) {
+    MPI_Init(&argc, &argv);
+
     if (argc != 6) {
         std::cout << "Invalid arguments" << std::flush;
         return 1;
@@ -50,4 +53,6 @@ int main(int argc, char** argv) {
     std::cout << "Testing VPS:\n" << std::flush;
     testVPS(numTrials, timeToUse, n, d, numThreads);
     std::cout << "Done!\n" << std::flush;
+
+    MPI_Finalize();
 }
