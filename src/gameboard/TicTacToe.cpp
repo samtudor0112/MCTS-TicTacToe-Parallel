@@ -376,6 +376,18 @@ int TicTacToe::getNumMoves() const {
     return numMoves;
 }
 
+void TicTacToe::setGameStatus(GameStatus _status) {
+    this->status = _status;
+}
+
+int TicTacToe::getN() const {
+    return n;
+}
+
+int TicTacToe::getD() const {
+    return d;
+}
+
 
 TicTacToe::~TicTacToe() {
 //    delete[] whiteBoard;

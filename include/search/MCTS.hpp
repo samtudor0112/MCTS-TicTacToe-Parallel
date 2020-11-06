@@ -29,6 +29,9 @@ private:
     double getReward(PlayerColour nodeColour, GameStatus result);
     State getBestMoveFromFinishedTree(Node* finalRoot);
     Node* combineTrees(int* finalVisits);
+    Node* buildSearchTree(int* finalVisits);
+    Node* collectOtherTrees(Node* finalRoot);
+    void sendTree(Node* finalRoot);
 public:
     MCTS(const State& startState, double timeLimit, int numThreads);
     State getBestMove(int* finalVisits);

@@ -4,6 +4,8 @@
 #include <mpi.h>
 #include "State.hpp"
 
+#define MASTER_RANK 0
+
 void bcast_state_out(State state, int root, MPI_Comm communicator);
 
 State bcast_state_in(int n, int d, int root, MPI_Comm communicator);

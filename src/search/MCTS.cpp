@@ -1,11 +1,15 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "openmp-use-default-none"
 #include "../../include/search/MCTS.hpp"
 #include "../../include/gameboard/hashes.hpp"
+#include "../../include/gameboard/MPI_helpers.hpp"
 #include <chrono>
 #include <functional>
 #include <stack>
 #include <utility>
 #include <omp.h>
 #include <unordered_set>
+#include <mpi.h>
 
 // We assume that we are the player who's colour's turn it is in the startState.
 MCTS::MCTS(const State& startState, double timeLimit, int numThreads) :
@@ -18,6 +22,106 @@ MCTS::MCTS(const State& startState, double timeLimit, int numThreads) :
 // Executes the MCTS search. Takes slightly longer than timeLimit.
 // Will return the approximately best State object which is the result of the best move.
 State MCTS::getBestMove(int* finalVisits) {
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank == MASTER_RANK) {
+        auto startTime = std::chrono::system_clock::now();
+        auto endTime = startTime + std::chrono::duration<double>(timeLimit);
+        Node* finalRoot;
+
+#pragma omp parallel num_threads(numThreads)
+        {
+            Node* root = roots[omp_get_thread_num()];
+            while (std::chrono::system_clock::now() < endTime) {
+                Node* newNode = selectAndExpandNewNode(root);
+                GameStatus playoutResult = simulatePlayout(newNode);
+                backPropagateResult(newNode, playoutResult);
+            }
+#pragma omp barrier
+#pragma omp master
+            {
+                finalRoot = combineTrees(finalVisits);
+            }
+#pragma omp barrier
+            // We make our own finalRoot so we can clean up all the other roots' trees
+            cleanUpNodes(root);
+        }
+
+        collectOtherTrees(finalRoot);
+
+        if (finalVisits != nullptr) {
+            // Collect the final visits
+            int collectedFinalVisits = 0;
+            MPI_Reduce(finalVisits, &collectedFinalVisits, 1, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+            *finalVisits = collectedFinalVisits;
+        }
+
+        // This function also broadcasts the final state to the slave processes
+        return getBestMoveFromFinishedTree(finalRoot);
+    } else {
+        Node* processRoot = buildSearchTree(finalVisits);
+        sendTree(processRoot);
+
+        // Send the final visits
+        MPI_Reduce(finalVisits, nullptr, 1, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+
+        // Receive the final state to return
+        State out = bcast_state_in(processRoot->getState().getBoard().getN(), processRoot->getState().getBoard().getD(), MASTER_RANK, MPI_COMM_WORLD);
+        cleanUpNodes(processRoot);
+        return out;
+    }
+
+}
+
+Node* MCTS::collectOtherTrees(Node* finalRoot) {
+    // All we need is the root Node, and it's children, which only need the correct number of visits. Anything else can
+    // be undefined
+    // We first broadcast the number of child states
+    // In theory, this should be the same for all processes, but if for some reason it isn't we'll just use the
+    // master's value for it
+    int numChildStates = finalRoot->getChildNodes()->size();
+    MPI_Bcast(&numChildStates, 1, MPI_INT, MASTER_RANK, MPI_COMM_WORLD);
+
+    for (int i = 0; i < numChildStates; i++) {
+        // Keep reducing via sum the number of visits for each child node for each process
+        Node* child = (*(finalRoot->getChildNodes()))[i];
+        bcast_state_out(child->getState(), MASTER_RANK, MPI_COMM_WORLD);
+        int numVisits = child->getVisits();
+        int totalVisits = 0;
+        MPI_Reduce(&numVisits, &totalVisits, 1, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+        child->setVisits(totalVisits);
+    }
+
+    return finalRoot;
+}
+
+void MCTS::sendTree(Node* finalRoot) {
+    // First receieve the number of child states
+    int numChildStates = 0;
+    MPI_Bcast(&numChildStates, 1, MPI_INT, MASTER_RANK, MPI_COMM_WORLD);
+    int ourNumChildStates = finalRoot->getChildNodes()->size();
+    for (int i = 0; i < numChildStates; i++) {
+        // Keep reading a state, finding it's index then sending via reduce the number of visits
+        State child = bcast_state_in(finalRoot->getState().getBoard().getN(), finalRoot->getState().getBoard().getD(), MASTER_RANK, MPI_COMM_WORLD);
+        int index = -1;
+        for (int j = 0; j < ourNumChildStates; j++) {
+            // We iterate through this process's root's child nodes to look for child. We start at a funny index to
+            // try and find it first try
+            int tempIndex = (i + j) % ourNumChildStates;
+            if ((*(finalRoot->getChildNodes()))[tempIndex]->getState() == child) {
+                index = tempIndex;
+            }
+        }
+        int numVisits = 0;
+        if (index != -1) {
+            numVisits = (*(finalRoot->getChildNodes()))[index]->getVisits();
+        }
+        MPI_Reduce(&numVisits, nullptr, 1, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+    }
+}
+
+Node* MCTS::buildSearchTree(int* finalVisits) {
     auto startTime = std::chrono::system_clock::now();
     auto endTime = startTime + std::chrono::duration<double>(timeLimit);
     Node* finalRoot;
@@ -39,8 +143,7 @@ State MCTS::getBestMove(int* finalVisits) {
         // We make our own finalRoot so we can clean up all the other roots' trees
         cleanUpNodes(root);
     }
-    return getBestMoveFromFinishedTree(finalRoot);
-
+    return finalRoot;
 }
 
 // The select component of the MCTS algorithm. Also calls the expand component of the MCTS algorithm if necessary.
@@ -180,6 +283,8 @@ State MCTS::getBestMoveFromFinishedTree(Node* finalRoot) {
 
     cleanUpNodes(finalRoot);
 
+    bcast_state_out(bestState, MASTER_RANK, MPI_COMM_WORLD);
+
     return bestState;
 }
 
@@ -214,3 +319,5 @@ double MCTS::UCTValue(Node* node, int parentVisits) {
     return node->getReward() / (double) node->getVisits()
             + sqrt(2.0 * log(parentVisits) / (double) node->getVisits());
 }
+
+#pragma clang diagnostic pop

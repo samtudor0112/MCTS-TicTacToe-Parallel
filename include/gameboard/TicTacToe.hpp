@@ -31,12 +31,15 @@ public:
     std::vector<TicTacToe> getAllLegalMoveStates(PlayerColour turn);
     std::string boardToString();
     GameStatus getGameStatus();
+    void setGameStatus(GameStatus _status);
     ~TicTacToe();
     int getSize() const;
     bool operator==(const TicTacToe& t2) const;
     std::vector<int> getWhiteBoard() const;
     std::vector<int> getBlackBoard() const;
     int getNumMoves() const;
+    int getN() const;
+    int getD() const;
 };
 
 
