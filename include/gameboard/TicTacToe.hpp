@@ -32,7 +32,6 @@ public:
     std::string boardToString();
     GameStatus getGameStatus();
     void setGameStatus(GameStatus _status);
-    ~TicTacToe();
     int getSize() const;
     bool operator==(const TicTacToe& t2) const;
     std::vector<int> getWhiteBoard() const;
