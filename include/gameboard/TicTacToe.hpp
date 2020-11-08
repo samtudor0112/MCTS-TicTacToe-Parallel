@@ -31,7 +31,6 @@ public:
     std::vector<TicTacToe> getAllLegalMoveStates(PlayerColour turn);
     std::string boardToString();
     GameStatus getGameStatus();
-    ~TicTacToe();
     int getSize() const;
 };
 

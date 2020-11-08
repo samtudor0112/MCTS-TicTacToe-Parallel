@@ -299,7 +299,7 @@ void TicTacToe::updateGameStatus(PlayerColour lastTurn, int lastPosition) {
     status = numMoves == size ? draw : inProgress;
 }
 
-// Returns a (crappy) string representation of the current board.
+// Returns a (crappy) string representation of the current board. Only works for n=3, d=3
 std::string TicTacToe::boardToString() {
 //    std::string out = "-------\n";
 //    for (int i = 0; i < 3; i++) {
@@ -357,9 +357,4 @@ GameStatus TicTacToe::getGameStatus() {
 // Returns the size of the board
 int TicTacToe::getSize() const {
     return pow(n, d);
-}
-
-TicTacToe::~TicTacToe() {
-//    delete[] whiteBoard;
-//    delete[] blackBoard;
 }

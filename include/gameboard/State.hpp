@@ -11,10 +11,6 @@
 // result of a game
 class State {
 private:
-    // gameStatus doesn't automatically update. To check if the game has ended, updateGameStatus() must be called
-    // before checking gameStatus.
-    GameStatus gameStatus;
-
     // The rules of the board are mostly independent of this class and entirely independent of the rest of the program.
     // i.e. to change the game / rules (to checkers) only the class of this member variable and a few function
     // declarations would need to be changed
