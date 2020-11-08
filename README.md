@@ -1,10 +1,12 @@
 # COSC3500-parallel
 A parallel hypercube tic-tac-toe engine using MCTS
 
+This is the serial branch.
+
 COSC3500 Major Project Final
 
 Compilation instructions:
-I am using cmake to build my project. The version of cmake on getafix is new enough to be able to build my project, but if not, an installation script cmake.sh is provided.
+I am using CMake to build my project. The version of CMake on getafix is new enough to be able to build my project, but if not, an installation script cmake.sh is provided.
 
 1. Start in directory COSC3500-parallel
 2. ```module load gnu cmake```
