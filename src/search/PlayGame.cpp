@@ -29,6 +29,7 @@ GameStatus play_game(State startState, double timeToUse, bool print, int numThre
     } else {
         // Slave
         // Same as the above loop but without printing or collecting data
+        // We let the MCTS search deal with the different processes
         while(true) {
             MCTS search = MCTS(currentState, timeToUse, numThreads);
             State bestMove = search.getBestMove(nullptr);
@@ -71,6 +72,7 @@ double play_game_vps(State startState, double timeToUse, bool print, int numThre
     } else {
         // Slave
         // Same as the above loop but without printing or collecting data
+        // We let the MCTS search deal with the different processes
         int numVisits = 0;
         while(true) {
             MCTS search = MCTS(currentState, timeToUse, numThreads);

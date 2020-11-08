@@ -4,6 +4,7 @@
 #include "../../include/search/PlayGame.hpp"
 #include "../../include/gameboard/MPI_helpers.hpp"
 
+// Tests the engine for correctness and print the result
 void testCorrectness(int numTrials, double timeToUse, int n, int d, int numThreads) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -37,6 +38,7 @@ void testCorrectness(int numTrials, double timeToUse, int n, int d, int numThrea
 
 }
 
+// Test the engine's VPS and print the result
 void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -63,7 +65,8 @@ void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
     }
 }
 
-// Tests the engine for correctness and VPS (visits/second).
+// Tests the engine for correctness and VPS (visits/second). Requires the following command line arguments:
+// ./tests n d numTrials timePerMove numThreads
 int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
 

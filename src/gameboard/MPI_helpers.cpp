@@ -1,9 +1,13 @@
 #include "../../include/gameboard/MPI_helpers.hpp"
 
+// Broadcasts a State object to the root process. It does this by broadcasting all relevant members variables of the
+// State.
+// This is probably very slow. It could be improved by using a custom MPI datatype, but this seemed difficult.
 void bcast_state_out(State state, int root, MPI_Comm communicator) {
     PlayerColour turn = state.getTurn();
     MPI_Bcast(&turn, 1, MPI_INT, root, communicator);
 
+    // The rest is sending the TicTacToe data
     MPI_Bcast(&(state.getBoard().getWhiteBoard()[0]), state.getBoard().getSize(), MPI_INT, root, communicator);
 
     MPI_Bcast(&(state.getBoard().getBlackBoard()[0]), state.getBoard().getSize(), MPI_INT, root, communicator);
@@ -15,6 +19,7 @@ void bcast_state_out(State state, int root, MPI_Comm communicator) {
     MPI_Bcast(&status, 1, MPI_INT, root, communicator);
 }
 
+// The corresponding function to receive a broadcasted State object.
 State bcast_state_in(int n, int d, int root, MPI_Comm communicator) {
     int size = pow(n, d);
     int* buffer = new int[size];

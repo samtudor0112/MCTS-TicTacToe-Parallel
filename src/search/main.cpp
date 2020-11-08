@@ -20,11 +20,11 @@ int main(int argc, char** argv) {
     if (rank == MASTER_RANK) {
         // master
         std::cout << "Start\n" << std::flush;
-        play_game(currentState, 1, true, 2);
+        play_game(currentState, 3, true, 2);
         std::cout << "Done!\n" << std::flush;
     } else {
         // slave
-        play_game(currentState, 1, true, 2);
+        play_game(currentState, 3, true, 2);
     }
 
     MPI_Finalize();

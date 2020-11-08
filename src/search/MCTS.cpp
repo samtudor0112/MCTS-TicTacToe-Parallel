@@ -26,6 +26,7 @@ State MCTS::getBestMove(int* finalVisits) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if (rank == MASTER_RANK) {
+        // Master
         auto startTime = std::chrono::system_clock::now();
         auto endTime = startTime + std::chrono::duration<double>(timeLimit);
         Node* finalRoot;
@@ -48,6 +49,7 @@ State MCTS::getBestMove(int* finalVisits) {
             cleanUpNodes(root);
         }
 
+        // Combines all the finalRoots from each process
         collectOtherTrees(finalRoot);
 
         if (finalVisits != nullptr) {
@@ -60,6 +62,7 @@ State MCTS::getBestMove(int* finalVisits) {
         // This function also broadcasts the final state to the slave processes
         return getBestMoveFromFinishedTree(finalRoot);
     } else {
+        // Slave
         Node* processRoot = buildSearchTree(finalVisits);
         sendTree(processRoot);
 
@@ -76,6 +79,8 @@ State MCTS::getBestMove(int* finalVisits) {
 
 }
 
+// Collect the child nodes of the root node from every process. Requests a state corresponding to a child then reduces
+// the number of visits from each process to a sum total.
 Node* MCTS::collectOtherTrees(Node* finalRoot) {
     // All we need is the root Node, and it's children, which only need the correct number of visits. Anything else can
     // be undefined
@@ -98,6 +103,8 @@ Node* MCTS::collectOtherTrees(Node* finalRoot) {
     return finalRoot;
 }
 
+// The slave function corresponding to collectOtherTrees. Waits to recieve a state, then sends the number of visits
+// for that state
 void MCTS::sendTree(Node* finalRoot) {
     // First receieve the number of child states
     int numChildStates = 0;
@@ -123,6 +130,8 @@ void MCTS::sendTree(Node* finalRoot) {
     }
 }
 
+// The same as the normal MCTS getBestMove function, but instead of finding the best move at the end of the search
+// simply returns the root of the populated search tree
 Node* MCTS::buildSearchTree(int* finalVisits) {
     auto startTime = std::chrono::system_clock::now();
     auto endTime = startTime + std::chrono::duration<double>(timeLimit);

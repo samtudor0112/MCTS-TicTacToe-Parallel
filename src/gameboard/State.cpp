@@ -37,7 +37,7 @@ TicTacToe State::getBoard() const {
     return board;
 }
 
-// I'm writing this like java because I don't know how overloading comparison operators works
+// Checks if two states are the same, just check the turn and the board
 bool State::operator==(const State& s2) const {
     return turn == s2.turn && board == s2.board;
 }
