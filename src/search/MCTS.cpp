@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "openmp-use-default-none"
 #include "../../include/search/MCTS.hpp"
 #include "../../include/gameboard/hashes.hpp"
 #include <chrono>
@@ -17,6 +19,7 @@ MCTS::MCTS(const State& startState, double timeLimit, int numThreads) :
 
 // Executes the MCTS search. Takes slightly longer than timeLimit.
 // Will return the approximately best State object which is the result of the best move.
+// Will assign finalVisits to the number of visits of the combined root node if it isn't nullptr.
 State MCTS::getBestMove(int* finalVisits) {
     auto startTime = std::chrono::system_clock::now();
     auto endTime = startTime + std::chrono::duration<double>(timeLimit);
@@ -214,3 +217,5 @@ double MCTS::UCTValue(Node* node, int parentVisits) {
     return node->getReward() / (double) node->getVisits()
             + sqrt(2.0 * log(parentVisits) / (double) node->getVisits());
 }
+
+#pragma clang diagnostic pop

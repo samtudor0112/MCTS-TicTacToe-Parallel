@@ -2,6 +2,7 @@
 #include "../../include/gameboard/State.hpp"
 #include "../../include/search/PlayGame.hpp"
 
+// Tests the engine for correctness and print the result
 void testCorrectness(int numTrials, double timeToUse, int n, int d, int numThreads) {
     int numWhiteWins = 0;
     int numDraws = 0;
@@ -20,6 +21,7 @@ void testCorrectness(int numTrials, double timeToUse, int n, int d, int numThrea
             << "s per move over " << numTrials << " trials.\n" << std::flush;
 }
 
+// Test the engine's VPS and print the result
 void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
     double vps = 0;
     for (int i = 0; i < numTrials; i++) {
@@ -32,7 +34,8 @@ void testVPS(int numTrials, double timeToUse, int n, int d, int numThreads) {
             << "s per move over " << numTrials << " trials.\n" << std::flush;
 }
 
-// Tests the engine for correctness and VPS (visits/second).
+// Tests the engine for correctness and VPS (visits/second). Requires the following command line arguments:
+// ./tests n d numTrials timePerMove numThreads
 int main(int argc, char** argv) {
     if (argc != 6) {
         std::cout << "Invalid arguments" << std::flush;
