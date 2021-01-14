@@ -33,6 +33,7 @@ public:
     GameStatus getGameStatus();
     int getSize() const;
     int getPos(int x, int y);
+    ConnectFour textToMove(PlayerColour turn, int x);
 };
 
 

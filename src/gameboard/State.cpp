@@ -32,3 +32,7 @@ std::string State::getStringBoard() {
 PlayerColour State::getTurn() {
     return turn;
 }
+
+State State::textToMove(int x) {
+    return State(otherPlayer(turn), board.textToMove(turn, x));
+}

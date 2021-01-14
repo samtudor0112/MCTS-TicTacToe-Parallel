@@ -1,6 +1,7 @@
 #include <cstring>
 #include <iterator>
 #include <utility>
+#include <iostream>
 #include "../../include/gameboard/ConnectFour.hpp"
 
 ConnectFour::ConnectFour(int w, int h) {
@@ -252,4 +253,40 @@ int ConnectFour::getSize() const {
 
 int ConnectFour::getPos(int x, int y) {
     return x * h + y;
+}
+
+ConnectFour ConnectFour::textToMove(PlayerColour turn, int x) {
+    std::vector<int>* oldBoard = turn == white ? &whiteBoard : &blackBoard;
+    std::vector<int> newBoard;
+
+    std::vector<int>* otherBoard = turn == white ? &blackBoard : &whiteBoard;
+    std::vector<int> otherBoardCopy;
+
+    if ((*oldBoard)[getPos(x, h - 1)] == 0 && (*otherBoard)[getPos(x, h - 1)] == 0) {
+        // This row has at least one space
+        newBoard = *oldBoard;
+        otherBoardCopy = *otherBoard;
+
+        int pos;
+        for (int j = 0; j < h; j++) {
+            pos = getPos(x, j);
+            if ((*oldBoard)[pos] == 0 && (*otherBoard)[pos] == 0) {
+                newBoard[pos] = 1;
+                break;
+            }
+        }
+
+        if (turn == white) {
+            ConnectFour newGame = ConnectFour(w, h, newBoard, otherBoardCopy, numMoves + 1);
+            newGame.updateGameStatus(turn, pos);
+            return newGame;
+        } else {
+            ConnectFour newGame = ConnectFour(w, h, otherBoardCopy, newBoard, numMoves + 1);
+            newGame.updateGameStatus(turn, pos);
+            return newGame;
+        }
+    } else {
+        std::cout << "Uh Oh!\n" << std::flush;
+        return *this;
+    }
 }

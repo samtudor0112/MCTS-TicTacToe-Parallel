@@ -25,6 +25,7 @@ public:
     std::vector<State> getAllLegalMoveStates();
     std::string getStringBoard();
     PlayerColour getTurn();
+    State textToMove(int x);
 };
 
 
