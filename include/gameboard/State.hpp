@@ -2,7 +2,7 @@
 #define SERIAL_STATE_HPP
 
 #include "common.hpp"
-#include "TicTacToe.hpp"
+#include "ConnectFour.hpp"
 
 // A wrapper class for the board object.
 // This means we only have to modify this class to change the game the engine works on
@@ -14,13 +14,13 @@ private:
     // The rules of the board are mostly independent of this class and entirely independent of the rest of the program.
     // i.e. to change the game / rules (to checkers) only the class of this member variable and a few function
     // declarations would need to be changed
-    TicTacToe board;
+    ConnectFour board;
 
     PlayerColour turn;
 
 public:
-    State(int n, int d);
-    State(PlayerColour turn, const TicTacToe& board);
+    State(int w, int h);
+    State(PlayerColour turn, const ConnectFour& board);
     GameStatus getGameStatus();
     std::vector<State> getAllLegalMoveStates();
     std::string getStringBoard();

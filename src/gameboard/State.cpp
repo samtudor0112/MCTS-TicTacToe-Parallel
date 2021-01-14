@@ -10,19 +10,19 @@ GameStatus State::getGameStatus() {
 // though we do change the turn here.
 std::vector<State> State::getAllLegalMoveStates() {
     std::vector<State> out = std::vector<State>();
-    std::vector<TicTacToe> boards = board.getAllLegalMoveStates(turn);
+    std::vector<ConnectFour> boards = board.getAllLegalMoveStates(turn);
     // We try this to improve the time spent in push_back
     out.reserve(boards.size());
-    for(const TicTacToe& each_board: boards) {
+    for(const ConnectFour& each_board: boards) {
         out.emplace_back(State(otherPlayer(turn), each_board));
     }
     return out;
 }
 
 // Default board of our current game (e.g. Tic Tac Toe), default white's turn
-State::State(int n, int d) : turn(white), board(TicTacToe(n, d)) {}
+State::State(int w, int h) : turn(white), board(ConnectFour(w, h)) {}
 
-State::State(PlayerColour turn, const TicTacToe& board) : turn(turn), board(board) {}
+State::State(PlayerColour turn, const ConnectFour& board) : turn(turn), board(board) {}
 
 // A totally decorative wrapper for our current game's (e.g. Tic Tac Toe's) getStringBoard function.
 std::string State::getStringBoard() {
